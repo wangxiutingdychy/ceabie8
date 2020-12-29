@@ -1,0 +1,22 @@
+
+buildscript {
+    repositories {
+        maven { url uri('./repo') }
+        maven { url "http://10.0.2.187:8081/nexus/content/groups/android-public" }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.ceabie.dextools:dexknife:1.5.0'
+    }
+}
+
+allprojects {
+    repositories {
+
+        maven { url "http://10.0.2.187:8081/nexus/content/groups/android-public" }
+        jcenter()
+        mavenCentral()
+    }
+}

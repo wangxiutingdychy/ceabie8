@@ -1,0 +1,122 @@
+import com.android.build.api.transform.Format
+import com.ceabie.dexknife.AbstractSplitTools
+import com.ceabie.dexknife.MultiDexAndroidBuilder
+
+/*
+* 自动分包脚本
+* auto split to more dex
+* (above for Android gradle plugin 1.5.0)
+*
+* 在 secDexPackages 中指定要放到第二个dex中的包名前缀，脚本会自动合并系统推荐的类。
+*
+* @author ceabie
+ */
+//            variant.getVariantData().getScope().getTransformManager().transforms
+//            Map<String, AndroidTask> andTasks = variant.variantData.scope.transformManager.taskRegistry.tasks
+
+afterEvaluate { project ->
+    android.applicationVariants.each { variant ->
+        if (isMultiDexEnabled(variant)) {
+//            println("========= " + variant.name.capitalize())
+            processSecDexAll(variant)
+        }
+    }
+}
+
+private void processSecDexAll(Object variant) {
+    def dexTask
+    def proGuardTask
+    def jarMergingTask
+
+    String name = variant.name.capitalize()
+    boolean minifyEnabled = variant.buildType.minifyEnabled
+
+    tasks.matching {
+        (it.class.simpleName.startsWith("TransformTask") && it.name.endsWith(name)) // TransformTask
+    }.each { theTask ->
+        def transform = theTask.transform
+        String transformName = transform.name
+
+        if (minifyEnabled && "proguard".equals(transformName)) { // ProGuardTransform
+            proGuardTask = theTask
+        } else if (!minifyEnabled && "jarMerging".equals(transformName)) {
+            jarMergingTask = theTask
+        } else if ("dex".equals(transformName)) { // DexTransform
+            dexTask = theTask
+        }
+    }
+
+    if (dexTask != null) {
+        dexTask.inputs.file "second_dex_package_list.txt"
+
+        dexTask.doFirst {
+            def dexTransform = it.transform
+            if (dexTransform.multiDex) {
+                def apkJarTask
+                String jarName
+                File allJar = null
+
+                if (variant.buildType.minifyEnabled) {
+                    // 获得混淆后的jar
+                    apkJarTask = proGuardTask
+                    jarName = "main"
+                } else {
+                    apkJarTask = jarMergingTask
+                    jarName = "combined"
+                }
+
+                if (apkJarTask != null) {
+                    def transform = apkJarTask.transform
+                    def outputProvider = apkJarTask.outputStream.asOutput()
+                    allJar = outputProvider.getContentLocation(jarName,
+                            transform.getOutputTypes(),
+                            transform.getScopes(), Format.JAR)
+                }
+
+                println ("========= DexTransform-doFirst: " + allJar)
+
+                if (allJar != null) {
+                    AbstractSplitTools.processMainDexList(project, variant, allJar)
+
+                    // 替换 AndroidBuilder
+                    MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform)
+                }
+
+                // 替换这个文件
+                File fileMainList = dexTransform.mainDexListFile
+                fileMainList.delete()
+                copy {
+                    from 'maindexlist.txt'
+                    into fileMainList.parentFile
+                }
+            }
+        }
+    }
+}
+
+boolean isMultiDexEnabled(variant) {
+    def is = variant.buildType.multiDexEnabled
+    if (is != null) {
+        return is;
+    }
+
+    is = variant.mergedFlavor.multiDexEnabled
+    if (is != null) {
+        return is;
+    }
+
+    return false
+}
+
+//private static File getProguardJar(proguardTask) {
+//    def jars = proguardTask.transform.configuration.programJars
+//    int size = jars.size()
+//    for (int i = 0; i < size; i++) {
+//        def entry = jars.get(i)
+//        if (entry.isOutput() && entry.isJar()) {
+//            return new File(entry.file)
+//        }
+//    }
+//
+//    return null;
+//}

@@ -1,0 +1,57 @@
+//buildscript {
+//    repositories {
+//        jcenter()
+//    }
+//    dependencies {
+//        classpath 'nu.studer:gradle-plugindev-plugin:1.0.3'
+//    }
+//}
+repositories {
+    jcenter()
+}
+
+//plugins {
+//    id 'groovy'
+////    id 'nu.studer.plugindev' version '1.0.3'
+//    id 'maven'
+//}
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+//version = '0.1'
+//group = 'com.ceabie.dextools'
+
+//plugindev {
+//    pluginImplementationClass 'DexSwordPlugin'
+//    pluginDescription 'A simple android plugin to use the wildcards of package to smart split the specified classes to second dex.'
+//    pluginLicenses 'Apache-2.0'
+//    pluginTags 'gradle', 'plugin', 'dex', 'split', 'multidex'
+//    authorId 'ceabie'
+//    authorName 'ceabie'
+//    authorEmail 'ceabie@gmail.com'
+//    projectUrl 'https://github.com/ceabie/gradle-dex-sword-plugin'
+//    projectInceptionYear '2016'
+//    done() // do not omit this
+//}
+//
+//bintray {
+//    user = "$BINTRAY_USER"
+//    key = "$BINTRAY_API_KEY"
+//    pkg.repo = 'gradle-plugins'
+//}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+            pom.version = "1.3.0"
+            pom.artifactId = "dexknife"
+            pom.groupId = "com.ceabie.dextools"
+        }
+    }
+}
