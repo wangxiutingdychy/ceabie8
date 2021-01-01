@@ -37,6 +37,7 @@ android {
 //        }
 //    }
 
+
     packagingOptions {
         exclude ".readme"
     }
@@ -50,12 +51,8 @@ dependencies {
     //    compile 'com.google.dagger:dagger:2.0'
     //    apt 'com.google.dagger:dagger-compiler:2.0'
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.parse.bolts:bolts-android:1.2.0'
     compile project(':lib1')
 }
-
-//apply from: 'second_dex_for_1_3.gradle'
-//apply from: 'second_dex_above_1_5.gradle'
 
 // 要放到第二个dex中的包名前缀 second_dex_package_list.txt
 // Set the prefix of package's path in second_dex_package_list.txt
