@@ -2,7 +2,6 @@
 buildscript {
     repositories {
         maven { url uri('./repo') }
-        maven { url "http://10.0.2.187:8081/nexus/content/groups/android-public" }
         jcenter()
         mavenCentral()
     }
@@ -14,8 +13,6 @@ buildscript {
 
 allprojects {
     repositories {
-
-        maven { url "http://10.0.2.187:8081/nexus/content/groups/android-public" }
         jcenter()
         mavenCentral()
     }
