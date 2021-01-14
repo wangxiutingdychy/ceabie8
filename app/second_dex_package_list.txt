@@ -1,2 +1,2 @@
-rx.
-android.support.v7.
+rx.**
+android.support.v?.**

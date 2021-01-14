@@ -1,0 +1,30 @@
+repositories {
+    jcenter()
+}
+
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:builder:1.5.0'
+    compile 'com.android.tools.build:gradle-core:1.5.0'
+}
+//
+//static boolean isHigh150() {
+//    String version = Version.ANDROID_GRADLE_PLUGIN_VERSION
+//    int size = version.size()
+//    int ver = 0;
+//    for (int i=0; i< size; i++) {
+//        char c = version.charAt(i)
+//        if (Character.isDigit(c) || c == '.') {
+//            if (c != '.') {
+//                ver = ver * 10 + c - '0'
+//            }
+//        } else {
+//            break;
+//        }
+//    }
+//
+//    return ver >= 150;
+//}
