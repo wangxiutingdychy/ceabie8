@@ -10,14 +10,9 @@ import org.gradle.api.Project
  *
  * @author ceabie
  */
-public class SplitToolsFor150 extends AbstractSplitTools {
+public class SplitToolsFor150 extends DexSplitTools {
 
-    public SplitToolsFor150(Project project) {
-        super(project)
-    }
-
-    @Override
-    public void processSplitDex(Object variant) {
+    public static void processSplitDex(Project project, Object variant) {
         TransformTask dexTask
         TransformTask proGuardTask
         TransformTask jarMergingTask
@@ -25,10 +20,9 @@ public class SplitToolsFor150 extends AbstractSplitTools {
         String name = variant.name.capitalize()
         boolean minifyEnabled = variant.buildType.minifyEnabled
 
-        mProject.tasks.matching {
+        project.tasks.matching {
             ((it instanceof TransformTask) && it.name.endsWith(name)) // TransformTask
         }.each { TransformTask theTask ->
-//            println ("========= TransformTask: " + (theTask instanceof TransformTask) )
             Transform transform = theTask.transform
             String transformName = transform.name
 
@@ -42,7 +36,7 @@ public class SplitToolsFor150 extends AbstractSplitTools {
         }
 
         if (dexTask != null) {
-            dexTask.inputs.file "second_dex_package_list.txt"
+            dexTask.inputs.file DEX_KNIFE_CFG_TXT
 
             dexTask.doFirst {
                 DexTransform dexTransform = it.transform
@@ -68,19 +62,23 @@ public class SplitToolsFor150 extends AbstractSplitTools {
                                 transform.getScopes(), Format.JAR)
                     }
 
-                    println ("========= DexSword-MergedJar: " + mergedJar)
+                    println ("========= DexKnife-MergedJar: " + mergedJar)
+
+                    File fileMainList = dexTransform.mainDexListFile
 
                     if (mergedJar != null) {
-                        processMainDexList(variant, mergedJar)
+                        File mappingFile = variant.mappingFile
+
+                        processMainDexList(project, minifyEnabled,
+                                mappingFile, mergedJar, fileMainList)
 
                         // 替换 AndroidBuilder
                         MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform)
                     }
 
                     // 替换这个文件
-                    File fileMainList = dexTransform.mainDexListFile
                     fileMainList.delete()
-                    mProject.copy {
+                    project.copy {
                         from 'maindexlist.txt'
                         into fileMainList.parentFile
                     }
