@@ -5,6 +5,7 @@ import com.android.build.api.transform.Transform
 import com.android.build.gradle.internal.pipeline.TransformTask
 import com.android.build.gradle.internal.transforms.DexTransform
 import org.gradle.api.Project
+
 /**
  * the spilt tools for plugin 1.5.0.
  *
@@ -14,7 +15,7 @@ public class SplitToolsFor150 extends DexSplitTools {
 
     public static void processSplitDex(Project project, Object variant) {
         TransformTask dexTask
-        TransformTask proGuardTask
+//        TransformTask proGuardTask
         TransformTask jarMergingTask
 
         String name = variant.name.capitalize()
@@ -26,62 +27,52 @@ public class SplitToolsFor150 extends DexSplitTools {
             Transform transform = theTask.transform
             String transformName = transform.name
 
-            if (minifyEnabled && "proguard".equals(transformName)) { // ProGuardTransform
-                proGuardTask = theTask
-            } else if (!minifyEnabled && "jarMerging".equals(transformName)) {
+//            if (minifyEnabled && "proguard".equals(transformName)) { // ProGuardTransform
+//                proGuardTask = theTask
+//            } else
+            if (!minifyEnabled && "jarMerging".equals(transformName)) {
                 jarMergingTask = theTask
             } else if ("dex".equals(transformName)) { // DexTransform
                 dexTask = theTask
             }
         }
 
-        if (dexTask != null) {
+        if (dexTask != null && ((DexTransform) dexTask.transform).multiDex) {
             dexTask.inputs.file DEX_KNIFE_CFG_TXT
 
             dexTask.doFirst {
+                File mergedJar = null
                 DexTransform dexTransform = it.transform
-                if (dexTransform.multiDex) {
-                    TransformTask apkJarTask
-                    String jarName
-                    File mergedJar = null
+                DexKnifeConfig dexKnifeConfig = getDexKnifeConfig(project)
 
-                    if (variant.buildType.minifyEnabled) {
-                        // 获得混淆后的jar
-                        apkJarTask = proGuardTask
-                        jarName = "main"
-                    } else {
-                        apkJarTask = jarMergingTask
-                        jarName = "combined"
-                    }
+                if (!minifyEnabled && jarMergingTask != null) {
+                    Transform transform = jarMergingTask.transform
+                    def outputProvider = jarMergingTask.outputStream.asOutput()
+                    mergedJar = outputProvider.getContentLocation("combined",
+                            transform.getOutputTypes(),
+                            transform.getScopes(), Format.JAR)
+                }
 
-                    if (apkJarTask != null) {
-                        Transform transform = apkJarTask.transform
-                        def outputProvider = apkJarTask.outputStream.asOutput()
-                        mergedJar = outputProvider.getContentLocation(jarName,
-                                transform.getOutputTypes(),
-                                transform.getScopes(), Format.JAR)
-                    }
+                println("========= DexKnife-MergedJar: " + mergedJar)
 
-                    println ("========= DexKnife-MergedJar: " + mergedJar)
+                File fileMainList = dexTransform.mainDexListFile
 
-                    File fileMainList = dexTransform.mainDexListFile
+                if (mergedJar != null) {
+                    File mappingFile = variant.mappingFile
 
-                    if (mergedJar != null) {
-                        File mappingFile = variant.mappingFile
+                    processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
+                            fileMainList, dexKnifeConfig)
 
-                        processMainDexList(project, minifyEnabled,
-                                mappingFile, mergedJar, fileMainList)
+                    // 替换 AndroidBuilder
+                    MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform,
+                            dexKnifeConfig.additionalParameters)
+                }
 
-                        // 替换 AndroidBuilder
-                        MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform)
-                    }
-
-                    // 替换这个文件
-                    fileMainList.delete()
-                    project.copy {
-                        from 'maindexlist.txt'
-                        into fileMainList.parentFile
-                    }
+                // 替换这个文件
+                fileMainList.delete()
+                project.copy {
+                    from 'maindexlist.txt'
+                    into fileMainList.parentFile
                 }
             }
         }

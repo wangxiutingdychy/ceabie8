@@ -25,7 +25,6 @@ public abstract class AbstractSplitTools {
 
 
     /**
-     * 获得第二个分包的类过滤列表
      */
     private static ArrayList<String> getSecondPackages(Project project) throws Exception {
         ArrayList<String> secDexPackages = new ArrayList<>();

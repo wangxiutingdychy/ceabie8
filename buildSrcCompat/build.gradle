@@ -28,12 +28,12 @@ configurations {
     compile.extendsFrom provided
 }
 
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
-//        runtimeClasspath += configurations.provided
-    }
-}
+//sourceSets {
+//    main {
+//        compileClasspath += configurations.provided
+////        runtimeClasspath += configurations.provided
+//    }
+//}
 
 dependencies {
     compile gradleApi()

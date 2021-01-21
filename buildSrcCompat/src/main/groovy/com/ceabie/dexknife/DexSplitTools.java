@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -26,55 +27,126 @@ public class DexSplitTools {
 
     public static final String DEX_KNIFE_CFG_TXT = "dexknife.txt";
 
-    public static void processMainDexList(Project project, boolean minifyEnabled,
-                                          File mappingFile, File jarMergingOutputFile,
-                                          File andMainDexList) throws Exception {
+    private static final String DEX_MINIMAL_MAIN_DEX = "--minimal-main-dex";
+
+    private static final String DEX_KNIFE_CFG_DEX_PARAM = "-dex-param ";
+    private static final String DEX_KNIFE_CFG_SPLIT = "-split ";
+    private static final String DEX_KNIFE_CFG_KEEP = "-keep ";
+    private static final String DEX_KNIFE_CFG_AUTO_MAINDEX = "-auto-maindex";
+    private static final String DEX_KNIFE_CFG_MINIMAL_MAINDEX = "-minimal-maindex";
+    private static final String DEX_KNIFE_CFG_DONOT_USE_SUGGEST = "-donot-use-suggest";
+    private static final String DEX_KNIFE_CFG_LOG_MAIN_DEX = "-log-mainlist";
+    public static final String MAINDEXLIST_TXT = "maindexlist.txt";
+
+    public static void processMainDexList(Project project, boolean minifyEnabled, File mappingFile,
+                                          File jarMergingOutputFile, File andMainDexList,
+                                          DexKnifeConfig dexKnifeConfig) throws Exception {
 
         genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile, andMainDexList,
-                getMainDexPattern(project));
+                dexKnifeConfig);
     }
 
     /**
-     * 获得第二个分包的类过滤列表
+     * get the config of dex knife
      */
-    private static PatternSet getMainDexPattern(Project project) throws Exception {
-        File file = project.file(DEX_KNIFE_CFG_TXT);
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+    protected static DexKnifeConfig getDexKnifeConfig(Project project) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(project.file(DEX_KNIFE_CFG_TXT)));
+        DexKnifeConfig dexKnifeConfig = new DexKnifeConfig();
+
+        boolean minimalMainDex = true;
+
+        Set<String> addParams = new HashSet<>();
 
         String line;
-        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> splitToSecond = new ArrayList<>();
+        ArrayList<String> keepMain = new ArrayList<>();
+
         while ((line = reader.readLine()) != null) {
-            line = line.trim().replace('.', '/');
-            lines.add(line);
+            line = line.trim();
+            if (line.length() == 0) {
+                continue;
+            }
+
+            int rem = line.indexOf('#');
+            if (rem != -1) {
+                if (rem == 0) {
+                    continue;
+                } else {
+                    line = line.substring(0, rem).trim();
+                }
+            }
+
+            String cmd = line.toLowerCase();
+
+            System.out.println("====== config: " + cmd);
+
+            if (DEX_KNIFE_CFG_AUTO_MAINDEX.equals(cmd)) {
+                minimalMainDex = false;
+            } else if (DEX_KNIFE_CFG_MINIMAL_MAINDEX.equals(cmd)) {
+                minimalMainDex = true;
+
+            } else if (cmd.startsWith(DEX_KNIFE_CFG_DEX_PARAM)) {
+                String param = line.substring(DEX_KNIFE_CFG_DEX_PARAM.length()).trim();
+                if (!param.toLowerCase().startsWith("--main-dex-list")) {
+                    addParams.add(param);
+                }
+
+            } else if (cmd.startsWith(DEX_KNIFE_CFG_SPLIT)) {
+                String sPattern = line.substring(DEX_KNIFE_CFG_SPLIT.length()).trim();
+                splitToSecond.add(sPattern.replace('.', '/'));
+
+            } else if (cmd.startsWith(DEX_KNIFE_CFG_KEEP)) {
+                String sPattern = line.substring(DEX_KNIFE_CFG_KEEP.length()).trim();
+                keepMain.add(sPattern.replace('.', '/'));
+
+            } else if (DEX_KNIFE_CFG_DONOT_USE_SUGGEST.equals(cmd)) {
+                dexKnifeConfig.useSuggest = false;
+
+            } else if (DEX_KNIFE_CFG_LOG_MAIN_DEX.equals(cmd)) {
+                dexKnifeConfig.logMainList = true;
+
+            } else if (!cmd.startsWith("-")) {
+                splitToSecond.add(line.replace('.', '/'));
+            }
         }
 
         reader.close();
 
-        return new PatternSet().exclude(lines);
+        if (minimalMainDex) {
+            addParams.add(DEX_MINIMAL_MAIN_DEX);
+        }
+
+        dexKnifeConfig.patternSet = new PatternSet()
+                        .exclude(splitToSecond).include(keepMain);
+        dexKnifeConfig.additionalParameters = addParams;
+        return dexKnifeConfig;
     }
 
     /**
-     * 生成主dex的类列表
+     * generate the main dex list
      */
     private static void genMainDexList(Project project, boolean minifyEnabled,
                                        File mappingFile, File jarMergingOutputFile,
-                                       File andMainDexList, PatternSet mainDexPattern) throws Exception {
+                                       File andMainDexList, DexKnifeConfig dexKnifeConfig) throws Exception {
 
         System.out.println(":" + project.getName() + ":genMainDexList");
 
-        // 获得 ADT 推荐的 maindexlist
-        HashSet<String> mainCls = getAdtMainDexClasses(andMainDexList);
+        // get the adt's maindexlist
+        HashSet<String> mainCls = null;
+        if (dexKnifeConfig.useSuggest) {
+            mainCls = getAdtMainDexClasses(andMainDexList);
+        }
 
-        File keepFile = project.file("maindexlist.txt");
+        File keepFile = project.file(MAINDEXLIST_TXT);
         keepFile.delete();
 
         ArrayList<String> mainClasses;
         if (minifyEnabled) {
-            // 从mapping文件中收集混淆后的 class
-            mainClasses = getMainClassesFromMapping(mappingFile, mainDexPattern, mainCls);
+            // get classes from mapping
+            mainClasses = getMainClassesFromMapping(mappingFile, dexKnifeConfig.patternSet, mainCls);
         } else {
-            // 从合并后的jar文件中收集 class
-            mainClasses = getMainClassesFromJar(jarMergingOutputFile, mainDexPattern, mainCls);
+            // get classes from merged jar
+            mainClasses = getMainClassesFromJar(jarMergingOutputFile, dexKnifeConfig.patternSet, mainCls);
         }
 
         if (mainClasses != null && mainClasses.size() > 0) {
@@ -84,7 +156,9 @@ public class DexSplitTools {
                 writer.write(mainClass);
                 writer.newLine();
 
-                System.out.println(mainClass);
+                if (dexKnifeConfig.logMainList) {
+                    System.out.println(mainClass);
+                }
             }
 
             writer.close();
@@ -107,7 +181,6 @@ public class DexSplitTools {
             if (entryName.endsWith(".class")) {
                 treeElement.setClassPath(entryName);
 
-                // 如果ADT的类在主dex，则不放在第二个dex
                 if (asSpec.isSatisfiedBy(treeElement)
                         || (mainCls != null && mainCls.contains(entryName))) {
                     mainDexList.add(entryName);

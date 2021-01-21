@@ -1,5 +1,4 @@
 include ':app', ':lib1'
-//include ':buildSrc13'
-//include ':buildSrcCompat'
+include ':buildSrcCompat'
 
 

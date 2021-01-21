@@ -1,2 +1,8 @@
-rx.**
+-donot-use-suggest #do not use suggest of the maindexlist that android gradle plugin generate.
+-log-mainlist # log the main dex classes.
+
+-split rx.**  # same as rx.**
+
+-keep android.support.v4.**
+
 android.support.v?.**
