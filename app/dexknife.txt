@@ -3,6 +3,6 @@
 
 -split rx.**  # same as rx.**
 
--keep android.support.v4.**
+-keep android.support.v4.view.**
 
 android.support.v?.**

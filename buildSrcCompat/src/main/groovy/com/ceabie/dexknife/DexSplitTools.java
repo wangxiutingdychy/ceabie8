@@ -3,6 +3,7 @@ package com.ceabie.dexknife;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileTreeElement;
 import org.gradle.api.specs.Spec;
+import org.gradle.api.specs.Specs;
 import org.gradle.api.tasks.util.PatternSet;
 
 import java.io.BufferedReader;
@@ -169,7 +170,8 @@ public class DexSplitTools {
             File jarMergingOutputFile, PatternSet mainDexPattern, HashSet<String> mainCls) throws Exception {
         ZipFile clsFile = new ZipFile(jarMergingOutputFile);
 
-        final Spec<FileTreeElement> asSpec = mainDexPattern.getAsSpec();
+        final Spec<FileTreeElement> asSpec = Specs.or(mainDexPattern.getAsIncludeSpec(),
+                Specs.not(mainDexPattern.getAsExcludeSpec()));
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
 
         ArrayList<String> mainDexList = new ArrayList<>();
@@ -200,7 +202,8 @@ public class DexSplitTools {
         ArrayList<String> mainDexList = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(mapping));
 
-        final Spec<FileTreeElement> asSpec = mainDexPattern.getAsSpec();
+        final Spec<FileTreeElement> asSpec = Specs.or(mainDexPattern.getAsIncludeSpec(),
+                Specs.not(mainDexPattern.getAsExcludeSpec()));
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
 
         while ((line = reader.readLine()) != null) {
