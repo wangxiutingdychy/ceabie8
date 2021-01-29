@@ -18,10 +18,11 @@ public class DexKnifePlugin implements Plugin<Project> {
             for (variant in project.android.applicationVariants) {
                 if (isMultiDexEnabled(variant)) {
                     if (SplitToolsFor130.isCompat130(variant)) {
-                        SplitToolsFor130.processSplitDex(project, variant);
+                        SplitToolsFor130.processSplitDex(project, variant)
                     } else {
                         SplitToolsFor150.processSplitDex(project, variant)
                     }
+
                 }
             }
         }

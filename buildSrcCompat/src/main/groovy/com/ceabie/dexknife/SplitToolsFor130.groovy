@@ -29,14 +29,9 @@ public class SplitToolsFor130 extends DexSplitTools {
             dex.inputs.file DEX_KNIFE_CFG_TXT
 
             dex.doFirst {
+                startDexKnife()
+
                 DexKnifeConfig dexKnifeConfig = getDexKnifeConfig(project)
-
-                if (dex.additionalParameters == null) {
-                    dex.additionalParameters = []
-                }
-
-                dex.additionalParameters += '--main-dex-list=maindexlist.txt'
-                dex.additionalParameters += dexKnifeConfig.additionalParameters
 
                 def scope = variant.getVariantData().getScope()
                 File mergedJar = scope.jarMergingOutputFile
@@ -44,8 +39,17 @@ public class SplitToolsFor130 extends DexSplitTools {
                 File andMainDexList = scope.mainDexListFile
                 boolean minifyEnabled = variant.buildType.minifyEnabled
 
-                processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
-                        andMainDexList, dexKnifeConfig)
+                if (processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
+                        andMainDexList, dexKnifeConfig)) {
+                    if (dex.additionalParameters == null) {
+                        dex.additionalParameters = []
+                    }
+
+                    dex.additionalParameters += '--main-dex-list=maindexlist.txt'
+                    dex.additionalParameters += dexKnifeConfig.additionalParameters
+                }
+
+                endDexKnife()
             }
         }
     }

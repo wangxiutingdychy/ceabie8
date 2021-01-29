@@ -21,6 +21,7 @@ public class SplitToolsFor150 extends DexSplitTools {
         String name = variant.name.capitalize()
         boolean minifyEnabled = variant.buildType.minifyEnabled
 
+        // find the task we want to process
         project.tasks.matching {
             ((it instanceof TransformTask) && it.name.endsWith(name)) // TransformTask
         }.each { TransformTask theTask ->
@@ -41,6 +42,8 @@ public class SplitToolsFor150 extends DexSplitTools {
             dexTask.inputs.file DEX_KNIFE_CFG_TXT
 
             dexTask.doFirst {
+                startDexKnife()
+
                 File mergedJar = null
                 DexTransform dexTransform = it.transform
                 DexKnifeConfig dexKnifeConfig = getDexKnifeConfig(project)
@@ -53,19 +56,20 @@ public class SplitToolsFor150 extends DexSplitTools {
                             transform.getScopes(), Format.JAR)
                 }
 
-                println("========= DexKnife-MergedJar: " + mergedJar)
+                println("DexKnife-MergedJar: " + mergedJar)
 
                 File fileMainList = dexTransform.mainDexListFile
 
                 if (mergedJar != null) {
                     File mappingFile = variant.mappingFile
 
-                    processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
-                            fileMainList, dexKnifeConfig)
+                    if (processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
+                            fileMainList, dexKnifeConfig)) {
 
-                    // 替换 AndroidBuilder
-                    MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform,
-                            dexKnifeConfig.additionalParameters)
+                        // 替换 AndroidBuilder
+                        MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform,
+                                dexKnifeConfig.additionalParameters)
+                    }
                 }
 
                 // 替换这个文件
@@ -74,6 +78,8 @@ public class SplitToolsFor150 extends DexSplitTools {
                     from 'maindexlist.txt'
                     into fileMainList.parentFile
                 }
+
+                endDexKnife()
             }
         }
     }

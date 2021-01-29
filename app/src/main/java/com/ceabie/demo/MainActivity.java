@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_save_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int dfg = 12211111;
+                int dfg = 122111;
                 Observable.just(1, 2, dfg)
                         .map(new Func1<Integer, Integer>() {
                             @Override

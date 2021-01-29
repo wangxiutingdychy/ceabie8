@@ -34,17 +34,43 @@ public class DexSplitTools {
     private static final String DEX_KNIFE_CFG_SPLIT = "-split ";
     private static final String DEX_KNIFE_CFG_KEEP = "-keep ";
     private static final String DEX_KNIFE_CFG_AUTO_MAINDEX = "-auto-maindex";
-    private static final String DEX_KNIFE_CFG_MINIMAL_MAINDEX = "-minimal-maindex";
     private static final String DEX_KNIFE_CFG_DONOT_USE_SUGGEST = "-donot-use-suggest";
     private static final String DEX_KNIFE_CFG_LOG_MAIN_DEX = "-log-mainlist";
-    public static final String MAINDEXLIST_TXT = "maindexlist.txt";
 
-    public static void processMainDexList(Project project, boolean minifyEnabled, File mappingFile,
+    private static final String MAINDEXLIST_TXT = "maindexlist.txt";
+
+    private static long StartTime = 0;
+
+    protected static void startDexKnife() {
+        System.out.println("Processing DexKnife ...");
+        StartTime = System.currentTimeMillis();
+    }
+
+    protected static void endDexKnife() {
+        String time;
+        long internal = System.currentTimeMillis() - StartTime;
+        if (internal > 1000) {
+            float i = internal / 1000;
+            if (i >= 60) {
+                i = i / 60;
+                int min = (int)i;
+                time = min + " min " + (i - min) + " secs";
+            } else {
+                time = i + "secs";
+            }
+        } else {
+            time = internal + "ms";
+        }
+
+        System.out.println("Finished DexKnife: " + time);
+    }
+
+    public static boolean processMainDexList(Project project, boolean minifyEnabled, File mappingFile,
                                           File jarMergingOutputFile, File andMainDexList,
                                           DexKnifeConfig dexKnifeConfig) throws Exception {
 
-        genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile, andMainDexList,
-                dexKnifeConfig);
+        return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
+                andMainDexList, dexKnifeConfig);
     }
 
     /**
@@ -79,13 +105,10 @@ public class DexSplitTools {
 
             String cmd = line.toLowerCase();
 
-            System.out.println("====== config: " + cmd);
+            System.out.println("DexKnife Config: " + cmd);
 
             if (DEX_KNIFE_CFG_AUTO_MAINDEX.equals(cmd)) {
                 minimalMainDex = false;
-            } else if (DEX_KNIFE_CFG_MINIMAL_MAINDEX.equals(cmd)) {
-                minimalMainDex = true;
-
             } else if (cmd.startsWith(DEX_KNIFE_CFG_DEX_PARAM)) {
                 String param = line.substring(DEX_KNIFE_CFG_DEX_PARAM.length()).trim();
                 if (!param.toLowerCase().startsWith("--main-dex-list")) {
@@ -118,7 +141,7 @@ public class DexSplitTools {
         }
 
         dexKnifeConfig.patternSet = new PatternSet()
-                        .exclude(splitToSecond).include(keepMain);
+                .exclude(splitToSecond).include(keepMain);
         dexKnifeConfig.additionalParameters = addParams;
         return dexKnifeConfig;
     }
@@ -126,9 +149,9 @@ public class DexSplitTools {
     /**
      * generate the main dex list
      */
-    private static void genMainDexList(Project project, boolean minifyEnabled,
-                                       File mappingFile, File jarMergingOutputFile,
-                                       File andMainDexList, DexKnifeConfig dexKnifeConfig) throws Exception {
+    private static boolean genMainDexList(Project project, boolean minifyEnabled,
+                                          File mappingFile, File jarMergingOutputFile,
+                                          File andMainDexList, DexKnifeConfig dexKnifeConfig) throws Exception {
 
         System.out.println(":" + project.getName() + ":genMainDexList");
 
@@ -143,9 +166,11 @@ public class DexSplitTools {
 
         ArrayList<String> mainClasses;
         if (minifyEnabled) {
+            System.out.println("DexKnife: From Mapping");
             // get classes from mapping
             mainClasses = getMainClassesFromMapping(mappingFile, dexKnifeConfig.patternSet, mainCls);
         } else {
+            System.out.println("DexKnife: From Merged Jar");
             // get classes from merged jar
             mainClasses = getMainClassesFromJar(jarMergingOutputFile, dexKnifeConfig.patternSet, mainCls);
         }
@@ -163,7 +188,11 @@ public class DexSplitTools {
             }
 
             writer.close();
+
+            return true;
         }
+
+        throw new Exception("DexKnife Warnning: Main dex is EMPTY ! Check your config and project!");
     }
 
     private static ArrayList<String> getMainClassesFromJar(
@@ -235,6 +264,10 @@ public class DexSplitTools {
      * get the maindexlist of android gradle plugin
      */
     private static HashSet<String> getAdtMainDexClasses(File outputDir) throws Exception {
+        if (!outputDir.exists()) {
+            System.out.println("DexKnife Warnning: Android recommand Main dex is no exist, try run again!");
+            return null;
+        }
         HashSet<String> mainCls = new HashSet<>();
 
         BufferedReader reader = new BufferedReader(new FileReader(outputDir));
