@@ -36,15 +36,27 @@ Usage:<br/>
     '**' to match any number of directories or files<br/>
     Either '.' or '/' may be used in a pattern to separate directories. Patterns ending with '.' or '/' will have '**' automatically appended.
 
-    Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
+
+Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
 
 Other config key:
+
+    '#' is the comment.<br/>
 
     # if you want to keep some classes in main dex, use '-keep'.<br/>
     -keep android.support.v4.view.**
 
     # this path will to be split to second dex.<br/>
     android.support.v?.**
+
+    # do not use suggest of the maindexlist that android gradle plugin generate.
+    -donot-use-suggest
+
+    # without --minimal-main-dex, only spliting at dex id > 65536 . --minimal-main-dex is default
+    -auto-maindex
+
+    # log the main dex classes.
+    -log-mainlist
 
 
 4、add to your app's build.gradle, add this line:<br/>
