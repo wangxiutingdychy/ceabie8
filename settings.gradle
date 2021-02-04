@@ -1,4 +1,4 @@
-include ':app', ':lib1'
-include ':buildSrcCompat'
+//include ':app', ':lib1'
+include ':DexKnife'
 
 
