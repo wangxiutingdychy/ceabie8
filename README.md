@@ -29,24 +29,26 @@ Usage:<br/>
 3、Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br/>
 3、在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
 
-    Patterns may include:<br/>
+    Patterns may include:
 
-    '*' to match any number of characters<br/>
-    '?' to match any single character<br/>
-    '**' to match any number of directories or files<br/>
+    '*' to match any number of characters
+    '?' to match any single character
+    '**' to match any number of directories or files
     Either '.' or '/' may be used in a pattern to separate directories. Patterns ending with '.' or '/' will have '**' automatically appended.
 
 
 Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
 
+
+其他配置：<br/>
 Other config key:
 
-    '#' is the comment.<br/>
+    '#' is the comment.
 
-    # if you want to keep some classes in main dex, use '-keep'.<br/>
+    # if you want to keep some classes in main dex, use '-keep'.
     -keep android.support.v4.view.**
 
-    # this path will to be split to second dex.<br/>
+    # this path will to be split to second dex.
     android.support.v?.**
 
     # do not use suggest of the maindexlist that android gradle plugin generate.
