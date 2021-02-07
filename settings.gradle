@@ -1,4 +1,4 @@
-//include ':app', ':lib1'
-include ':DexKnife'
+include ':app', ':lib1'
+include ':gradle-dexknife-plugin'
 
 

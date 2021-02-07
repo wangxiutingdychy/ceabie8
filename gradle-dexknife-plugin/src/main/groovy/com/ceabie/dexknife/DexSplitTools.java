@@ -1,5 +1,7 @@
 package com.ceabie.dexknife;
 
+import com.android.builder.Version;
+
 import org.gradle.api.Project;
 import org.gradle.api.file.FileTreeElement;
 import org.gradle.api.specs.Spec;
@@ -42,7 +44,7 @@ public class DexSplitTools {
     private static long StartTime = 0;
 
     protected static void startDexKnife() {
-        System.out.println("Processing DexKnife ...");
+        System.out.println("DexKnife Processing ...");
         StartTime = System.currentTimeMillis();
     }
 
@@ -54,15 +56,33 @@ public class DexSplitTools {
             if (i >= 60) {
                 i = i / 60;
                 int min = (int)i;
-                time = min + " min " + (i - min) + " secs";
+                time = min + " min " + (i - min) + " s";
             } else {
-                time = i + "secs";
+                time = i + "s";
             }
         } else {
             time = internal + "ms";
         }
 
-        System.out.println("Finished DexKnife: " + time);
+        System.out.println("DexKnife Finished: " + time);
+    }
+
+    static int getAndroidPluginVersion() {
+        String version = Version.ANDROID_GRADLE_PLUGIN_VERSION;
+        int size = version.length();
+        int ver = 0;
+        for (int i = 0; i < size; i++) {
+            char c = version.charAt(i);
+            if (Character.isDigit(c) || c == '.') {
+                if (c != '.') {
+                    ver = ver * 10 + c - '0';
+                }
+            } else {
+                break;
+            }
+        }
+
+        return ver;
     }
 
     public static boolean processMainDexList(Project project, boolean minifyEnabled, File mappingFile,

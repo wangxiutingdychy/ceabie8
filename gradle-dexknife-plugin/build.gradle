@@ -10,6 +10,7 @@ buildscript {
 }
 
 apply plugin: 'groovy'
+apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
 apply plugin: 'com.jfrog.artifactory'
@@ -85,15 +86,15 @@ bintray {
     publications = ['mavenJava']
     pkg {
         repo = 'gradle-plugins'
-        name = 'DexKnifePlugin'
-        labels = ['gradle', 'plugin', 'dex', 'split', 'multidex', 'second sex']
+        name = 'gradle-dexknife-plugin'
+        labels = ['gradle', 'plugin', 'dex', 'split sex', 'multidex']
         websiteUrl = POM_URL
         vcsUrl = POM_URL + '.git'
         issueTrackerUrl = POM_URL + '/issues'
         licenses = ["Apache-2.0"]
         version {
             name = '1.5.0'
-            attributes = ['gradle-plugin': 'com.ceabie.dextools:dexknife']
+            attributes = ['gradle-plugin': 'com.ceabie.dextools:gradle-dexknife-plugin']
         }
     }
     publish = true
@@ -112,13 +113,13 @@ task wrapper(type: Wrapper, description: 'Gradle Wrapper task') {
     gradleVersion = '2.8'
 }
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri('../repo'))
-//            pom.version = "1.2.0"
-//            pom.artifactId = "dexknife"
-//            pom.groupId = "com.ceabie.dextools"
-//        }
-//    }
-//}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+            pom.version = "1.5.0.dev"
+            pom.artifactId = "gradle-dexknife-plugin"
+            pom.groupId = "com.ceabie.dextools"
+        }
+    }
+}

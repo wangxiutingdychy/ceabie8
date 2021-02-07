@@ -17,12 +17,13 @@ public class DexKnifePlugin implements Plugin<Project> {
 
             for (variant in project.android.applicationVariants) {
                 if (isMultiDexEnabled(variant)) {
-                    if (SplitToolsFor130.isCompat130(variant)) {
+                    if (SplitToolsFor130.isCompat(variant)) {
                         SplitToolsFor130.processSplitDex(project, variant)
-                    } else {
+                    } else if (SplitToolsFor150.isCompat()) {
                         SplitToolsFor150.processSplitDex(project, variant)
+                    } else {
+                        println("DexKnife Error: Android gradle plugin only < 2.0.0.");
                     }
-
                 }
             }
         }

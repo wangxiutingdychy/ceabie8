@@ -9,7 +9,7 @@ import org.gradle.api.Project
  */
 public class SplitToolsFor130 extends DexSplitTools {
 
-    public static boolean isCompat130(Object variant) {
+    public static boolean isCompat(Object variant) {
         try {
             if (variant != null) {
                 variant.dex

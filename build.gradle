@@ -1,16 +1,16 @@
-
 buildscript {
     repositories {
 //        maven { url uri('./repo') }
         jcenter()
         mavenCentral()
-        jcenter {
-            url 'http://jcenter.bintray.com'
+        maven {
+            url "https://dl.bintray.com/ceabie/gradle-plugins"
         }
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
-//        classpath 'com.ceabie.dextools:dexknife:1.5.0'
+        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.0'
     }
 }
 

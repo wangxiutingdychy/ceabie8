@@ -4,6 +4,7 @@ import com.android.build.api.transform.Format
 import com.android.build.api.transform.Transform
 import com.android.build.gradle.internal.pipeline.TransformTask
 import com.android.build.gradle.internal.transforms.DexTransform
+import com.android.builder.Version
 import org.gradle.api.Project
 
 /**
@@ -12,6 +13,14 @@ import org.gradle.api.Project
  * @author ceabie
  */
 public class SplitToolsFor150 extends DexSplitTools {
+
+    public static boolean isCompat() {
+         if (getAndroidPluginVersion() < 200) {
+             return true;
+         }
+
+        return false;
+    }
 
     public static void processSplitDex(Project project, Object variant) {
         TransformTask dexTask
