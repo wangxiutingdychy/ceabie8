@@ -5,18 +5,4 @@
   <groupId>com.ceabie.dextools</groupId>
   <artifactId>dexknife</artifactId>
   <version>1.5.0</version>
-  <dependencies>
-    <dependency>
-      <groupId>com.android.tools.build</groupId>
-      <artifactId>gradle-core</artifactId>
-      <version>1.5.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.android.tools.build</groupId>
-      <artifactId>builder</artifactId>
-      <version>1.5.0</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
 </project>

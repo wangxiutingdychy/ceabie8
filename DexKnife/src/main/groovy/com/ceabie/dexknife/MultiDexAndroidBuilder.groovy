@@ -20,6 +20,8 @@ import java.lang.reflect.Field
  */
 public class MultiDexAndroidBuilder extends AndroidBuilder {
 
+    Collection<String> mAddParams;
+
     public MultiDexAndroidBuilder(String projectId,
                                   String createdBy,
                                   ProcessExecutor processExecutor,
@@ -42,11 +44,13 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                                 ProcessOutputHandler processOutputHandler)
             throws IOException, InterruptedException, ProcessException {
 
-        if (additionalParameters == null) {
-            additionalParameters = []
-        }
+        if (mAddParams != null) {
+            if (additionalParameters == null) {
+                additionalParameters = []
+            }
 
-        additionalParameters += '--minimal-main-dex'
+            additionalParameters += mAddParams //'--minimal-main-dex'
+        }
 
         super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
                 additionalParameters, incremental, optimize, processOutputHandler)
@@ -56,12 +60,15 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
 //        task.setAndroidBuilder(getProxyAndroidBuilder(task.getBuilder()))
 //    }
 
-    public static void proxyAndroidBuilder(DexTransform transform) {
-        accessibleField(DexTransform.class, "androidBuilder")
-                .set(transform, getProxyAndroidBuilder(transform.androidBuilder))
+    public static void proxyAndroidBuilder(DexTransform transform, Collection<String> addParams) {
+        if (addParams != null && addParams.size() > 0) {
+            accessibleField(DexTransform.class, "androidBuilder")
+                    .set(transform, getProxyAndroidBuilder(transform.androidBuilder, addParams))
+        }
     }
 
-    private static AndroidBuilder getProxyAndroidBuilder(AndroidBuilder orgAndroidBuilder) {
+    private static AndroidBuilder getProxyAndroidBuilder(AndroidBuilder orgAndroidBuilder,
+                                                         Collection<String> addParams) {
         MultiDexAndroidBuilder myAndroidBuilder = new MultiDexAndroidBuilder(
                 orgAndroidBuilder.mProjectId,
                 orgAndroidBuilder.mCreatedBy,
@@ -76,6 +83,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                 orgAndroidBuilder.getTargetInfo(),
                 orgAndroidBuilder.mLibraryRequests)
 
+        myAndroidBuilder.mAddParams = addParams
 //        myAndroidBuilder.mBootClasspathFiltered = orgAndroidBuilder.mBootClasspathFiltered
 //        myAndroidBuilder.mBootClasspathAll = orgAndroidBuilder.mBootClasspathAll
 
