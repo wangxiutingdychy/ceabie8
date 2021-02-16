@@ -4,7 +4,7 @@ buildscript {
         jcenter()
         mavenCentral()
         maven {
-            url "https://dl.bintray.com/ceabie/gradle-plugins"
+            url "https://jcenter.bintray.com"
         }
     }
 
