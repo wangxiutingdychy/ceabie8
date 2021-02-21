@@ -4,7 +4,7 @@ A simple android gradle plugin to use the patterns of package to smart split the
 一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。
 
 - **Notes: android gradle plugin only less than version 2.0.0. The instant-run of higher 2.0.0 interfere with generation.
-           You can develop on higher 2.0.0, and build release on 1.5.0 or 1.3.0 **
+           You can develop on higher 2.0.0, and build release on 1.5.0 or 1.3.0**
 
 - **注意：只能使用在 android gradle plugin 小于 2.0.0 的版本，高于 2.0.0的instant-run 特性会干扰代码生成过程。
           你可以在 2.0.0版本以上进行开发，在 1.5.0 或者 1.3.0进行打包。**
@@ -45,24 +45,43 @@ Usage:<br/>
 Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
 
 
-其他配置：<br/>
 Other config key:
 
     '#' is the comment.
 
-    # if you want to keep some classes in main dex, use '-keep'.
-    -keep android.support.v4.view.**
-
     # this path will to be split to second dex.
     android.support.v?.**
+
+    # if you want to keep some classes in main dex, use '-keep'.
+    -keep android.support.v4.view.**
 
     # do not use suggest of the maindexlist that android gradle plugin generate.
     -donot-use-suggest
 
-    # without --minimal-main-dex, only spliting at dex id > 65536 . --minimal-main-dex is default
-    -auto-maindex
+    # Notes: Split dex until the dex's id > 65536. --minimal-main-dex is default.
+    # -auto-maindex  # default is not used.
 
     # log the main dex classes.
+    -log-mainlist
+
+
+其他配置：
+
+    使用 # 进行注释.
+
+    # 如果你想要某个包路径在maindex中，则使用 -keep 选项，即使他已经在分包的路径中.
+    -keep android.support.v4.view.**
+
+    # 这条配置可以指定这个包下类在第二dex中.
+    android.support.v?.**
+
+    # 不包含Android gradle 插件自动生成的miandex列表.
+    -donot-use-suggest
+
+    # 不进行dex分包， 直到 dex 的id数量超过 65536.
+    # -auto-maindex
+
+    # 显示miandex的日志.
     -log-mainlist
 
 
