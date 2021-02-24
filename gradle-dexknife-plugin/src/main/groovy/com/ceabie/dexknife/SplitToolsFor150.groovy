@@ -54,38 +54,39 @@ public class SplitToolsFor150 extends DexSplitTools {
                 startDexKnife()
 
                 File mergedJar = null
+                File mappingFile = variant.mappingFile
                 DexTransform dexTransform = it.transform
+                File fileAdtMainList = dexTransform.mainDexListFile
+
                 DexKnifeConfig dexKnifeConfig = getDexKnifeConfig(project)
 
+                // 非混淆的，从合并后的jar文件中提起mainlist；
+                // 混淆的，直接从mapping文件中提取
                 if (!minifyEnabled && jarMergingTask != null) {
                     Transform transform = jarMergingTask.transform
                     def outputProvider = jarMergingTask.outputStream.asOutput()
                     mergedJar = outputProvider.getContentLocation("combined",
                             transform.getOutputTypes(),
                             transform.getScopes(), Format.JAR)
+
+                    println("DexKnife-From MergedJar: " + mergedJar)
+                } else {
+                    println("DexKnife-From Mapping: " + mappingFile)
                 }
 
-                println("DexKnife-MergedJar: " + mergedJar)
+                if (processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
+                        fileAdtMainList, dexKnifeConfig)) {
 
-                File fileMainList = dexTransform.mainDexListFile
+                    // 替换 AndroidBuilder
+                    MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform,
+                            dexKnifeConfig.additionalParameters)
 
-                if (mergedJar != null) {
-                    File mappingFile = variant.mappingFile
-
-                    if (processMainDexList(project, minifyEnabled, mappingFile, mergedJar,
-                            fileMainList, dexKnifeConfig)) {
-
-                        // 替换 AndroidBuilder
-                        MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform,
-                                dexKnifeConfig.additionalParameters)
+                    // 替换这个文件
+                    fileAdtMainList.delete()
+                    project.copy {
+                        from 'maindexlist.txt'
+                        into fileAdtMainList.parentFile
                     }
-                }
-
-                // 替换这个文件
-                fileMainList.delete()
-                project.copy {
-                    from 'maindexlist.txt'
-                    into fileMainList.parentFile
                 }
 
                 endDexKnife()

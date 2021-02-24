@@ -40,6 +40,8 @@ public class DexSplitTools {
     private static final String DEX_KNIFE_CFG_LOG_MAIN_DEX = "-log-mainlist";
 
     private static final String MAINDEXLIST_TXT = "maindexlist.txt";
+    public static final String MAPPING_FLAG = " -> ";
+    public static final int MAPPING_FLAG_LEN = MAPPING_FLAG.length();
 
     private static long StartTime = 0;
 
@@ -55,7 +57,7 @@ public class DexSplitTools {
             float i = internal / 1000;
             if (i >= 60) {
                 i = i / 60;
-                int min = (int)i;
+                int min = (int) i;
                 time = min + " min " + (i - min) + " s";
             } else {
                 time = i + "s";
@@ -86,8 +88,8 @@ public class DexSplitTools {
     }
 
     public static boolean processMainDexList(Project project, boolean minifyEnabled, File mappingFile,
-                                          File jarMergingOutputFile, File andMainDexList,
-                                          DexKnifeConfig dexKnifeConfig) throws Exception {
+                                             File jarMergingOutputFile, File andMainDexList,
+                                             DexKnifeConfig dexKnifeConfig) throws Exception {
 
         return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
                 andMainDexList, dexKnifeConfig);
@@ -244,29 +246,32 @@ public class DexSplitTools {
         return mainDexList;
     }
 
-    private static ArrayList<String> getMainClassesFromMapping(File mapping,
-                                                               PatternSet mainDexPattern,
-                                                               HashSet<String> mainCls) throws Exception {
+    private static ArrayList<String> getMainClassesFromMapping(
+            File mapping,
+            PatternSet mainDexPattern,
+            HashSet<String> mainCls) throws Exception {
+
         String line;
         ArrayList<String> mainDexList = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(mapping));
 
-        final Spec<FileTreeElement> asSpec = Specs.or(mainDexPattern.getAsIncludeSpec(),
-                Specs.not(mainDexPattern.getAsExcludeSpec()));
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
+        Spec<FileTreeElement> asSpec = Specs.or(Specs.not(mainDexPattern.getAsExcludeSpec()),
+                mainDexPattern.getAsIncludeSpec());
 
         while ((line = reader.readLine()) != null) {
             line = line.trim();
 
             if (line.endsWith(":")) {
-                int ip = line.indexOf(" -> ");
-                if (ip != -1) {
-                    String sOrg = line.substring(ip).replace('.', '/') + ".class";
+                int flagPos = line.indexOf(MAPPING_FLAG);
+                if (flagPos != -1) {
 
+                    String sOrg = line.substring(0, flagPos).replace('.', '/') + ".class";
                     treeElement.setClassPath(sOrg);
+
                     if (asSpec.isSatisfiedBy(treeElement)
                             || (mainCls != null && mainCls.contains(sOrg))) {
-                        String sMap = line.substring(ip + 4, line.length() - 1)
+                        String sMap = line.substring(flagPos + MAPPING_FLAG_LEN, line.length() - 1)
                                 .replace('.', '/') + ".class";
 
                         mainDexList.add(sMap);
