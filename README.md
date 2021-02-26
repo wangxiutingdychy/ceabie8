@@ -1,4 +1,4 @@
-# DexKnife
+# DexKnife (Latest is Update to 1.5.1, fix the proguard mode)
 
 A simple android gradle plugin to use the patterns of package to smart split the specified classes to second dex.<br/>
 一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。
