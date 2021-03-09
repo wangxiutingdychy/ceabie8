@@ -15,11 +15,11 @@ import org.gradle.api.Project
 public class SplitToolsFor150 extends DexSplitTools {
 
     public static boolean isCompat() {
-         if (getAndroidPluginVersion() < 200) {
-             return true;
-         }
+//         if (getAndroidPluginVersion() < 200) {
+//             return true;
+//         }
 
-        return false;
+        return true;
     }
 
     public static void processSplitDex(Project project, Object variant) {
@@ -62,14 +62,16 @@ public class SplitToolsFor150 extends DexSplitTools {
 
                 // 非混淆的，从合并后的jar文件中提起mainlist；
                 // 混淆的，直接从mapping文件中提取
-                if (!minifyEnabled && jarMergingTask != null) {
-                    Transform transform = jarMergingTask.transform
-                    def outputProvider = jarMergingTask.outputStream.asOutput()
-                    mergedJar = outputProvider.getContentLocation("combined",
-                            transform.getOutputTypes(),
-                            transform.getScopes(), Format.JAR)
+                if (!minifyEnabled) {
+                    if (jarMergingTask != null) {
+                        Transform transform = jarMergingTask.transform
+                        def outputProvider = jarMergingTask.outputStream.asOutput()
+                        mergedJar = outputProvider.getContentLocation("combined",
+                                transform.getOutputTypes(),
+                                transform.getScopes(), Format.JAR)
 
-                    println("DexKnife-From MergedJar: " + mergedJar)
+                        println("DexKnife-From MergedJar: " + mergedJar)
+                    }
                 } else {
                     println("DexKnife-From Mapping: " + mappingFile)
                 }

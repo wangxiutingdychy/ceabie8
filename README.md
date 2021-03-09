@@ -1,14 +1,17 @@
 # DexKnife
-**(Latest is Update to 1.5.1, fix the proguard mode)
+
+- **Update Log
+    1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）
+    1.5.1: fix the proguard mode
 
 A simple android gradle plugin to use the patterns of package to smart split the specified classes to second dex.<br/>
 一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。
 
-- **Notes: android gradle plugin only less than version 2.0.0. The instant-run of higher 2.0.0 interfere with generation.
-           You can develop on higher 2.0.0, and build release on 1.5.0 or 1.3.0**
+- **Notes: Only fully tested less than version 2.0.0.
+          Because instant-run of 2.0.0 above is disabled when you enable multidex, so no conflict with DexKnife.
 
-- **注意：只能使用在 android gradle plugin 小于 2.0.0 的版本，高于 2.0.0的instant-run 特性会干扰代码生成过程。
-          你可以在 2.0.0版本以上进行开发，在 1.5.0 或者 1.3.0进行打包。**
+- **注意：只在 android gradle plugin 小于 2.0.0 的版本上进行过完全测试。
+          由于高于 2.0.0 的 instant-run 特性在启用 multidex 时失效，所以与DexKnife无冲突。
 
 Usage:<br/>
 使用方法：
@@ -17,12 +20,12 @@ Usage:<br/>
 1、在你的工程的 build.gradle 中 buildscript.repositories 增加bintray的仓库.<br/>
 
     buildscript {
-        ....
+            ....
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:1.5.0'  // or 1.3.0
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.1'
+            classpath 'com.android.tools.build:gradle:2.1.0'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.1.exp' // Experimental
         }
     }
 

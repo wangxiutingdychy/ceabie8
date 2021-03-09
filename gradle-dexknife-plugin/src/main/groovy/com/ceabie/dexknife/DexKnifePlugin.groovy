@@ -24,6 +24,8 @@ public class DexKnifePlugin implements Plugin<Project> {
                     } else {
                         println("DexKnife Error: Android gradle plugin only < 2.0.0.");
                     }
+                } else {
+                    println("DexKnife : MultiDexEnabled is false, it's not work.");
                 }
             }
         }
