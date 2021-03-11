@@ -1,7 +1,8 @@
 # DexKnife
 
 - **Update Log
-    1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）
+    1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)<br/>
+    1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）<br/>
     1.5.1: fix the proguard mode
 
 A simple android gradle plugin to use the patterns of package to smart split the specified classes to second dex.<br/>
@@ -54,6 +55,9 @@ Other config key:
     # if you want to keep some classes in main dex, use '-keep'.
     -keep android.support.v4.view.**
 
+    # you can keep single class in main dex, end with '.class', use '-keep'.
+    -keep android.support.v7.app.AppCompatDialogFragment.class
+
     # do not use suggest of the maindexlist that android gradle plugin generate.
     -donot-use-suggest
 
@@ -73,6 +77,9 @@ Other config key:
 
     # 这条配置可以指定这个包下类在第二dex中.
     android.support.v?.**
+
+    # 使用.class后缀，代表单个类.
+    -keep android.support.v7.app.AppCompatDialogFragment.class
 
     # 不包含Android gradle 插件自动生成的miandex列表.
     -donot-use-suggest
