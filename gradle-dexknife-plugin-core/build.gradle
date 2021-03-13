@@ -1,0 +1,18 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}

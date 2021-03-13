@@ -62,18 +62,18 @@ public class SplitToolsFor150 extends DexSplitTools {
 
                 // 非混淆的，从合并后的jar文件中提起mainlist；
                 // 混淆的，直接从mapping文件中提取
-                if (!minifyEnabled) {
+                if (minifyEnabled) {
+                    println("DexKnife-From Mapping: " + mappingFile)
+                } else {
                     if (jarMergingTask != null) {
                         Transform transform = jarMergingTask.transform
                         def outputProvider = jarMergingTask.outputStream.asOutput()
                         mergedJar = outputProvider.getContentLocation("combined",
                                 transform.getOutputTypes(),
                                 transform.getScopes(), Format.JAR)
-
-                        println("DexKnife-From MergedJar: " + mergedJar)
                     }
-                } else {
-                    println("DexKnife-From Mapping: " + mappingFile)
+
+                    println("DexKnife-From MergedJar: " + mergedJar)
                 }
 
                 if (processMainDexList(project, minifyEnabled, mappingFile, mergedJar,

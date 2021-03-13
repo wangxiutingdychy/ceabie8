@@ -1,4 +1,6 @@
 include ':app', ':lib1'
 include ':gradle-dexknife-plugin'
+include ':gradle-dexknife-plugin13'
+include ':gradle-dexknife-plugin-core'
 
 
