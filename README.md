@@ -1,24 +1,20 @@
 # DexKnife
 
-- **Update Log
+Update Log
+--------
     1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)<br/>
     1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）<br/>
     1.5.1: fix the proguard mode
 
 A simple android gradle plugin to use the patterns of package to smart split the specified classes to second dex.<br/>
-一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。
 
 - **Notes: Only fully tested less than version 2.0.0.
           Because instant-run of 2.0.0 above is disabled when you enable multidex, so no conflict with DexKnife.
 
-- **注意：只在 android gradle plugin 小于 2.0.0 的版本上进行过完全测试。
-          由于高于 2.0.0 的 instant-run 特性在启用 multidex 时失效，所以与DexKnife无冲突。
-
-Usage:<br/>
-使用方法：
+Usage
+--------
 
 1、In your project's build.gradle, buildscript.repositories add the bintray's maven.<br/>
-1、在你的工程的 build.gradle 中 buildscript.repositories 增加bintray的仓库.<br/>
 
     buildscript {
             ....
@@ -26,12 +22,11 @@ Usage:<br/>
         dependencies {
             ....
             classpath 'com.android.tools.build:gradle:2.1.0'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.1.exp' // Experimental
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.2' // Experimental
         }
     }
 
 2、Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br/>
-2、在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
 
     Patterns may include:
 
@@ -41,9 +36,7 @@ Usage:<br/>
     Either '.' or '/' may be used in a pattern to separate directories.
     Patterns ending with '.' or '/' will have '**' automatically appended.
 
-
 Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
-
 
 Other config key:
 
@@ -67,6 +60,58 @@ Other config key:
     # log the main dex classes.
     -log-mainlist
 
+3、add to your app's build.gradle, add this line:<br/>
+
+    apply plugin: 'com.ceabie.dexnkife'
+
+and then, set your app
+
+    multiDexEnabled true
+
+   - **Notes: You want to set 'multiDexEnabled true' in 'defaultConfig' or 'buildTypes', otherwise ineffective.**
+
+4、run your app
+
+
+# 中文
+
+更新日志
+--------
+    1.5.2: 修复include和exclude, 并支持过滤单个类<br/>
+    1.5.1.exp: 实验性的支持 2.1.0 plugin<br/>
+    1.5.1: fix the proguard mode
+
+一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。
+
+- **注意：只在 android gradle plugin 小于 2.0.0 的版本上进行过完全测试。
+          由于高于 2.0.0 的 instant-run 特性在启用 multidex 时失效，所以与DexKnife无冲突。
+
+使用方法
+--------
+
+1、在你的工程的 build.gradle 中 buildscript.repositories 增加bintray的仓库.<br/>
+
+    buildscript {
+            ....
+
+        dependencies {
+            ....
+            classpath 'com.android.tools.build:gradle:2.1.0'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.2' // Experimental
+        }
+    }
+
+2、在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
+
+    Patterns may include:
+
+    '*' to match any number of characters
+    '?' to match any single character
+    '**' to match any number of directories or files
+    Either '.' or '/' may be used in a pattern to separate directories.
+    Patterns ending with '.' or '/' will have '**' automatically appended.
+
+更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
 
 其他配置：
 
@@ -91,18 +136,16 @@ Other config key:
     -log-mainlist
 
 
-3、add to your app's build.gradle, add this line:<br/>
 3、在你的App模块的build.gradle 增加：
 
     apply plugin: 'com.ceabie.dexnkife'
 
-and then, set your app
+最后，在app工程中设置：
 
     multiDexEnabled true
 
-   - **Notes: You want to set 'multiDexEnabled true' in 'defaultConfig' or 'buildTypes', otherwise ineffective.**
    - **注意：要在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用。**
 
-4、run your app
+4、编译你的应用
 
 
