@@ -1,20 +1,21 @@
 # DexKnife
 
-Update Log
---------
-    1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)<br/>
-    1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）<br/>
-    1.5.1: fix the proguard mode
 
-A simple android gradle plugin to use the patterns of package to smart split the specified classes to second dex.<br/>
+A simple android gradle plugin to use the patterns of package to smart split the specified classes to second dex.
 
 - **Notes: Only fully tested less than version 2.0.0.
           Because instant-run of 2.0.0 above is disabled when you enable multidex, so no conflict with DexKnife.
 
+Update Log
+----------
+    1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)
+    1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）
+    1.5.1: fix the proguard mode
+
 Usage
 --------
 
-1、In your project's build.gradle, buildscript.repositories add the bintray's maven.<br/>
+1、In your project's build.gradle, buildscript.repositories add the bintray's maven.
 
     buildscript {
             ....
@@ -60,7 +61,7 @@ Other config key:
     # log the main dex classes.
     -log-mainlist
 
-3、add to your app's build.gradle, add this line:<br/>
+3、add to your app's build.gradle, add this line:
 
     apply plugin: 'com.ceabie.dexnkife'
 
@@ -75,16 +76,16 @@ and then, set your app
 
 # 中文
 
-更新日志
---------
-    1.5.2: 修复include和exclude, 并支持过滤单个类<br/>
-    1.5.1.exp: 实验性的支持 2.1.0 plugin<br/>
-    1.5.1: fix the proguard mode
-
 一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。
 
 - **注意：只在 android gradle plugin 小于 2.0.0 的版本上进行过完全测试。
           由于高于 2.0.0 的 instant-run 特性在启用 multidex 时失效，所以与DexKnife无冲突。
+
+更新日志
+--------
+    1.5.2: 修复include和exclude, 并支持过滤单个类
+    1.5.1.exp: 实验性的支持 2.1.0 plugin
+    1.5.1: fix the proguard mode
 
 使用方法
 --------
