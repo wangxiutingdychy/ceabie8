@@ -25,20 +25,6 @@ import org.gradle.api.Project
  */
 public class DexKnifePlugin implements Plugin<Project> {
 
-    public static boolean isCompat130(Object variant) {
-        try {
-            if (variant != null) {
-                variant.dex
-
-                return true
-            }
-        } catch (RuntimeException e) {
-//            e.printStackTrace()
-        }
-
-        return false
-    }
-
     @Override
     void apply(Project project) {
 
@@ -46,12 +32,13 @@ public class DexKnifePlugin implements Plugin<Project> {
 
             for (variant in project.android.applicationVariants) {
                 if (isMultiDexEnabled(variant)) {
-                    if (isCompat130(variant)) {
-                        System.err.println("DexKnife Error: This version is only support Android gradle plugin >= 1.5.0. Please use DexKnife 1.3.2.");
+                    if (SplitToolsFor130.isCompat(variant)) {
+                        System.err.println("DexKnife: Compat 1.3.0.");
+                        SplitToolsFor130.processSplitDex(project, variant)
                     } else if (SplitToolsFor150.isCompat()) {
                         SplitToolsFor150.processSplitDex(project, variant)
                     } else {
-                        println("DexKnife Error: Android gradle plugin only < 2.0.0.");
+                        println("DexKnife Error: DexKnife is not compatible your Android gradle plugin.");
                     }
                 } else {
                     println("DexKnife : MultiDexEnabled is false, it's not work.");

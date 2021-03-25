@@ -15,7 +15,6 @@
  */
 package com.ceabie.dexknife
 
-import com.android.build.gradle.internal.pipeline.TransformTask
 import com.android.build.gradle.internal.transforms.DexTransform
 import com.android.builder.core.AndroidBuilder
 import com.android.builder.core.DexOptions
