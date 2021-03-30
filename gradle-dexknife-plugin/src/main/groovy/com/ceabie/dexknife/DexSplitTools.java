@@ -88,6 +88,11 @@ public class DexSplitTools {
                                              File jarMergingOutputFile, File andMainDexList,
                                              DexKnifeConfig dexKnifeConfig) throws Exception {
 
+        if (!minifyEnabled && jarMergingOutputFile == null) {
+            System.out.println("DexKnife Error: jarMerging is Null! Skip DexKnife. Please report All Gradle Log.");
+            return false;
+        }
+
         return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
                 andMainDexList, dexKnifeConfig);
     }
@@ -166,7 +171,7 @@ public class DexSplitTools {
             getMaindexSpec(dexKnifeConfig.patternSet);
         } else {
             dexKnifeConfig.useSuggest = true;
-            System.err.println("DexKnife Warnning: NO SET split Or keep path, it will use Suggest!");
+            System.err.println("DexKnife Warning: NO SET split Or keep path, it will use Suggest!");
         }
 
         dexKnifeConfig.additionalParameters = addParams;
@@ -270,7 +275,7 @@ public class DexSplitTools {
             return true;
         }
 
-        throw new Exception("DexKnife Warnning: Main dex is EMPTY ! Check your config and project!");
+        throw new Exception("DexKnife Warning: Main dex is EMPTY ! Check your config and project!");
     }
 
     private static ArrayList<String> getMainClassesFromJar(
@@ -343,7 +348,7 @@ public class DexSplitTools {
      */
     private static HashSet<String> getAdtMainDexClasses(File outputDir) throws Exception {
         if (outputDir == null || !outputDir.exists()) {
-            System.err.println("DexKnife Warnning: Android recommand Main dex is no exist, try run again!");
+            System.err.println("DexKnife Warning: Android recommand Main dex is no exist, try run again!");
             return null;
         }
 

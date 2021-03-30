@@ -38,10 +38,10 @@ public class DexKnifePlugin implements Plugin<Project> {
                     } else if (SplitToolsFor150.isCompat()) {
                         SplitToolsFor150.processSplitDex(project, variant)
                     } else {
-                        println("DexKnife Error: DexKnife is not compatible your Android gradle plugin.");
+                        System.err.println("DexKnife Error: DexKnife is not compatible your Android gradle plugin.");
                     }
                 } else {
-                    println("DexKnife : MultiDexEnabled is false, it's not work.");
+                    System.err.println("DexKnife : MultiDexEnabled is false, it's not work.");
                 }
             }
         }

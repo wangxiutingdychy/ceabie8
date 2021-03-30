@@ -52,12 +52,13 @@ public class SplitToolsFor150 extends DexSplitTools {
             Transform transform = theTask.transform
             String transformName = transform.name
 
+            println("DexKnife: task: " + transformName)
 //            if (minifyEnabled && "proguard".equals(transformName)) { // ProGuardTransform
 //                proGuardTask = theTask
 //            } else
-            if (!minifyEnabled && "jarMerging".equals(transformName)) {
+            if ("jarMerging".equalsIgnoreCase(transformName)) {
                 jarMergingTask = theTask
-            } else if ("dex".equals(transformName)) { // DexTransform
+            } else if ("dex".equalsIgnoreCase(transformName)) { // DexTransform
                 dexTask = theTask
             }
         }
