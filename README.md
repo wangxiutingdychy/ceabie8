@@ -16,8 +16,6 @@ Usage
 --------
 
 1、In your project's build.gradle, buildscript.
-**please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as: 
-  Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
     buildscript {
             ....
@@ -30,6 +28,9 @@ Usage
             // classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.3.2'
         }
     }
+
+  **please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as: 
+  Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
 2、Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br/>
 
@@ -95,9 +96,7 @@ and then, set your app
 --------
 
 1、在你的工程的 build.gradle 中 buildscript:
- **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：
-      Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
-         
+
     buildscript {
             ....
 
@@ -107,6 +106,9 @@ and then, set your app
             classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.2' // Experimental
         }
     }
+
+ **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：
+      Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
 2、在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
 
