@@ -22,17 +22,15 @@ Usage
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.1.0'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.2' // Experimental
-            // if com.android.tools.build:gradle < 1.5.0, use 1.3.2
-            // classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.3.2'
+            classpath 'com.android.tools.build:gradle:2.1.2'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.3' // Experimental
         }
     }
 
-  **please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as: 
-  Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
+**please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as:<br />
+Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2、Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br/>
+2、Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.
 
     Patterns may include:
 
@@ -102,12 +100,12 @@ and then, set your app
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.1.0'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.2' // Experimental
+            classpath 'com.android.tools.build:gradle:2.1.2'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.3' // Experimental
         }
     }
 
- **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：
+ **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：<br />
       Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
 2、在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
