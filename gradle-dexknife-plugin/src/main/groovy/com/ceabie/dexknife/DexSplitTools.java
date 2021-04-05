@@ -249,7 +249,7 @@ public class DexSplitTools {
             // get classes from mapping
             mainClasses = getMainClassesFromMapping(mappingFile, dexKnifeConfig.patternSet, mainCls);
         } else {
-            System.err.println("DexKnife: From Merged Jar: " + jarMergingOutputFile);
+            System.out.println("DexKnife: From MergedJar: " + jarMergingOutputFile);
             if (jarMergingOutputFile != null) {
                 // get classes from merged jar
                 mainClasses = getMainClassesFromJar(jarMergingOutputFile, dexKnifeConfig.patternSet, mainCls);

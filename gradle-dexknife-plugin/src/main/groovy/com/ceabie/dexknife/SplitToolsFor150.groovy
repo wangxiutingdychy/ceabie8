@@ -17,9 +17,9 @@ package com.ceabie.dexknife
 
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.Transform
+import com.android.build.gradle.internal.incremental.InstantRunBuildContext
 import com.android.build.gradle.internal.pipeline.TransformTask
 import com.android.build.gradle.internal.transforms.DexTransform
-import com.android.builder.Version
 import org.gradle.api.Project
 
 /**
@@ -38,6 +38,11 @@ public class SplitToolsFor150 extends DexSplitTools {
     }
 
     public static void processSplitDex(Project project, Object variant) {
+        if (isInInstantRunMode(variant)) {
+            System.err.println("DexKnife: Instant Run mode, DexKnife is auto disabled!")
+            return
+        }
+
         TransformTask dexTask
 //        TransformTask proGuardTask
         TransformTask jarMergingTask
@@ -52,7 +57,6 @@ public class SplitToolsFor150 extends DexSplitTools {
             Transform transform = theTask.transform
             String transformName = transform.name
 
-            println("DexKnife: task: " + transformName)
 //            if (minifyEnabled && "proguard".equals(transformName)) { // ProGuardTransform
 //                proGuardTask = theTask
 //            } else
@@ -73,6 +77,8 @@ public class SplitToolsFor150 extends DexSplitTools {
                 File mappingFile = variant.mappingFile
                 DexTransform dexTransform = it.transform
                 File fileAdtMainList = dexTransform.mainDexListFile
+
+                println("DexKnife Adt Main: " + fileAdtMainList)
 
                 DexKnifeConfig dexKnifeConfig = getDexKnifeConfig(project)
 
@@ -110,5 +116,16 @@ public class SplitToolsFor150 extends DexSplitTools {
                 endDexKnife()
             }
         }
+    }
+
+    private static boolean isInInstantRunMode(Object variant) {
+        try {
+            def scope = variant.getVariantData().getScope()
+            InstantRunBuildContext instantRunBuildContext = scope.getInstantRunBuildContext()
+            return instantRunBuildContext.isInInstantRunMode()
+        } catch (Throwable e) {
+        }
+
+        return false
     }
 }

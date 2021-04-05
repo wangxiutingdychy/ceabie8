@@ -46,7 +46,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         super(projectId, createdBy, processExecutor, javaProcessExecutor, errorReporter, logger, verboseExec)
     }
 
-    @Override
+//    @Override for < 2.2.0
     public void convertByteCode(Collection<File> inputs,
                                 File outDexFolder,
                                 boolean multidex,
@@ -63,16 +63,28 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                 additionalParameters = []
             }
 
-            additionalParameters += mAddParams //'--minimal-main-dex'
+            mergeParams(additionalParameters)
         }
 
         super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
                 additionalParameters, incremental, optimize, processOutputHandler)
     }
 
-//    public static void proxyAndroidBuilder(TransformTask task) {
-//        task.setAndroidBuilder(getProxyAndroidBuilder(task.getBuilder()))
-//    }
+    private boolean mergeParams(List<String> params) {
+        List<String> mergeParam = []
+        for (String param : mAddParams) {
+            if (!params.contains(param)) {
+                mergeParam.add(param)
+            }
+        }
+
+        boolean isMerge = mergeParam.size() > 0
+        if (isMerge) {
+            params.addAll(mergeParam)
+        }
+
+        return isMerge
+    }
 
     public static void proxyAndroidBuilder(DexTransform transform, Collection<String> addParams) {
         if (addParams != null && addParams.size() > 0) {
@@ -92,21 +104,26 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                 orgAndroidBuilder.getLogger(),
                 orgAndroidBuilder.mVerboseExec)
 
-        myAndroidBuilder.setTargetInfo(
-                orgAndroidBuilder.getSdkInfo(),
-                orgAndroidBuilder.getTargetInfo(),
-                orgAndroidBuilder.mLibraryRequests)
+        try {
+            myAndroidBuilder.setTargetInfo(
+                    orgAndroidBuilder.getSdkInfo(),
+                    orgAndroidBuilder.getTargetInfo(),
+                    orgAndroidBuilder.mLibraryRequests)
+        } catch (Exception e) {
+            System.err.println("DexKnife: please use DexKnife 1.5.5.alpha")
+            throw e
+        }
 
         myAndroidBuilder.mAddParams = addParams
 //        myAndroidBuilder.mBootClasspathFiltered = orgAndroidBuilder.mBootClasspathFiltered
 //        myAndroidBuilder.mBootClasspathAll = orgAndroidBuilder.mBootClasspathAll
 
-        myAndroidBuilder
+        return myAndroidBuilder
     }
 
     private static Field accessibleField(Class cls, String field) {
         Field f = cls.getDeclaredField(field)
         f.setAccessible(true)
-        f
+        return f
     }
 }
