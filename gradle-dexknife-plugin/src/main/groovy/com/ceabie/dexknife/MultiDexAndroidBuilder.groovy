@@ -19,6 +19,7 @@ import com.android.build.gradle.internal.transforms.DexTransform
 import com.android.builder.core.AndroidBuilder
 import com.android.builder.core.DexOptions
 import com.android.builder.core.ErrorReporter
+import com.android.builder.sdk.TargetInfo
 import com.android.ide.common.process.JavaProcessExecutor
 import com.android.ide.common.process.ProcessException
 import com.android.ide.common.process.ProcessExecutor
@@ -110,7 +111,12 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                     orgAndroidBuilder.getTargetInfo(),
                     orgAndroidBuilder.mLibraryRequests)
         } catch (Exception e) {
-            System.err.println("DexKnife: please use DexKnife 1.5.5.alpha")
+            // if >= 2.2.0
+            def to = myAndroidBuilder.respondsTo("setTargetInfo", TargetInfo.class)
+            if (to.size() > 0) {
+                System.err.println("DexKnife: please use DexKnife 1.5.5.alpha")
+            }
+
             throw e
         }
 
