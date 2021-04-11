@@ -23,8 +23,8 @@ Usage
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.1.2'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.3' // Experimental
+            classpath 'com.android.tools.build:gradle:2.1.3'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.4' // AGP <= 2.2.0
         }
     }
 
@@ -102,8 +102,8 @@ and then, set your app
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.1.2'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.3' // Experimental
+            classpath 'com.android.tools.build:gradle:2.1.3'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.4' // AGP <= 2.2.0
         }
     }
 
