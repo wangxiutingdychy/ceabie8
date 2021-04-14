@@ -47,7 +47,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         super(projectId, createdBy, processExecutor, javaProcessExecutor, errorReporter, logger, verboseExec)
     }
 
-//    @Override for < 2.2.0
+//    @Override // for < 2.2.0
     public void convertByteCode(Collection<File> inputs,
                                 File outDexFolder,
                                 boolean multidex,
@@ -59,6 +59,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                                 ProcessOutputHandler processOutputHandler)
             throws IOException, InterruptedException, ProcessException {
 
+        println("convertByteCode 1")
         if (mAddParams != null) {
             if (additionalParameters == null) {
                 additionalParameters = []
@@ -68,7 +69,35 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         }
 
         super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
-                additionalParameters, incremental, optimize, processOutputHandler)
+                additionalParameters, incremental, optimize, processOutputHandler);
+    }
+
+//    @Override for >= 2.2.0
+    public void convertByteCode(Collection<File> inputs,
+                                File outDexFolder,
+                                boolean multidex,
+                                File mainDexList,
+                                final DexOptions dexOptions,
+                                boolean optimize,
+                                ProcessOutputHandler processOutputHandler)
+            throws IOException, InterruptedException, ProcessException {
+
+        println("convertByteCode 2")
+
+        DexOptions dexOptionsProxy = dexOptions;
+
+        if (mAddParams != null) {
+            List<String> additionalParameters = dexOptions.getAdditionalParameters()
+            if (additionalParameters == null) {
+                additionalParameters = []
+            }
+
+            if (mergeParams(additionalParameters)) {
+                dexOptionsProxy = new DexOptionsProxy(dexOptions, additionalParameters)
+            }
+        }
+
+        super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy, optimize, processOutputHandler);
     }
 
     private boolean mergeParams(List<String> params) {
@@ -105,19 +134,17 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                 orgAndroidBuilder.getLogger(),
                 orgAndroidBuilder.mVerboseExec)
 
-        try {
+        // if >= 2.2.0
+        def to = myAndroidBuilder.respondsTo("setTargetInfo", TargetInfo.class)
+        if (to.size() > 0) {
+            myAndroidBuilder.setTargetInfo(orgAndroidBuilder.getTargetInfo())
+            myAndroidBuilder.setSdkInfo(orgAndroidBuilder.getSdkInfo())
+            myAndroidBuilder.setLibraryRequests(orgAndroidBuilder.mLibraryRequests)
+        } else {
             myAndroidBuilder.setTargetInfo(
                     orgAndroidBuilder.getSdkInfo(),
                     orgAndroidBuilder.getTargetInfo(),
                     orgAndroidBuilder.mLibraryRequests)
-        } catch (Exception e) {
-            // if >= 2.2.0
-            def to = myAndroidBuilder.respondsTo("setTargetInfo", TargetInfo.class)
-            if (to.size() > 0) {
-                System.err.println("DexKnife: please use DexKnife 1.5.5.alpha")
-            }
-
-            throw e
         }
 
         myAndroidBuilder.mAddParams = addParams
