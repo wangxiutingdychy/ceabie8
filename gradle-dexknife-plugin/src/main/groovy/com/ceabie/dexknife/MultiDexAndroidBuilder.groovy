@@ -19,6 +19,7 @@ import com.android.build.gradle.internal.transforms.DexTransform
 import com.android.builder.core.AndroidBuilder
 import com.android.builder.core.DexOptions
 import com.android.builder.core.ErrorReporter
+import com.android.builder.sdk.TargetInfo
 import com.android.ide.common.process.JavaProcessExecutor
 import com.android.ide.common.process.ProcessException
 import com.android.ide.common.process.ProcessExecutor
@@ -46,7 +47,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         super(projectId, createdBy, processExecutor, javaProcessExecutor, errorReporter, logger, verboseExec)
     }
 
-    @Override
+//    @Override // for < 2.2.0
     public void convertByteCode(Collection<File> inputs,
                                 File outDexFolder,
                                 boolean multidex,
@@ -58,21 +59,62 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                                 ProcessOutputHandler processOutputHandler)
             throws IOException, InterruptedException, ProcessException {
 
+        println("convertByteCode 1")
         if (mAddParams != null) {
             if (additionalParameters == null) {
                 additionalParameters = []
             }
 
-            additionalParameters += mAddParams //'--minimal-main-dex'
+            mergeParams(additionalParameters)
         }
 
         super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
-                additionalParameters, incremental, optimize, processOutputHandler)
+                additionalParameters, incremental, optimize, processOutputHandler);
     }
 
-//    public static void proxyAndroidBuilder(TransformTask task) {
-//        task.setAndroidBuilder(getProxyAndroidBuilder(task.getBuilder()))
-//    }
+//    @Override for >= 2.2.0
+    public void convertByteCode(Collection<File> inputs,
+                                File outDexFolder,
+                                boolean multidex,
+                                File mainDexList,
+                                final DexOptions dexOptions,
+                                boolean optimize,
+                                ProcessOutputHandler processOutputHandler)
+            throws IOException, InterruptedException, ProcessException {
+
+        println("convertByteCode 2")
+
+        DexOptions dexOptionsProxy = dexOptions;
+
+        if (mAddParams != null) {
+            List<String> additionalParameters = dexOptions.getAdditionalParameters()
+            if (additionalParameters == null) {
+                additionalParameters = []
+            }
+
+            if (mergeParams(additionalParameters)) {
+                dexOptionsProxy = new DexOptionsProxy(dexOptions, additionalParameters)
+            }
+        }
+
+        super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy, optimize, processOutputHandler);
+    }
+
+    private boolean mergeParams(List<String> params) {
+        List<String> mergeParam = []
+        for (String param : mAddParams) {
+            if (!params.contains(param)) {
+                mergeParam.add(param)
+            }
+        }
+
+        boolean isMerge = mergeParam.size() > 0
+        if (isMerge) {
+            params.addAll(mergeParam)
+        }
+
+        return isMerge
+    }
 
     public static void proxyAndroidBuilder(DexTransform transform, Collection<String> addParams) {
         if (addParams != null && addParams.size() > 0) {
@@ -92,21 +134,29 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                 orgAndroidBuilder.getLogger(),
                 orgAndroidBuilder.mVerboseExec)
 
-        myAndroidBuilder.setTargetInfo(
-                orgAndroidBuilder.getSdkInfo(),
-                orgAndroidBuilder.getTargetInfo(),
-                orgAndroidBuilder.mLibraryRequests)
+        // if >= 2.2.0
+        def to = myAndroidBuilder.respondsTo("setTargetInfo", TargetInfo.class)
+        if (to.size() > 0) {
+            myAndroidBuilder.setTargetInfo(orgAndroidBuilder.getTargetInfo())
+            myAndroidBuilder.setSdkInfo(orgAndroidBuilder.getSdkInfo())
+            myAndroidBuilder.setLibraryRequests(orgAndroidBuilder.mLibraryRequests)
+        } else {
+            myAndroidBuilder.setTargetInfo(
+                    orgAndroidBuilder.getSdkInfo(),
+                    orgAndroidBuilder.getTargetInfo(),
+                    orgAndroidBuilder.mLibraryRequests)
+        }
 
         myAndroidBuilder.mAddParams = addParams
 //        myAndroidBuilder.mBootClasspathFiltered = orgAndroidBuilder.mBootClasspathFiltered
 //        myAndroidBuilder.mBootClasspathAll = orgAndroidBuilder.mBootClasspathAll
 
-        myAndroidBuilder
+        return myAndroidBuilder
     }
 
     private static Field accessibleField(Class cls, String field) {
         Field f = cls.getDeclaredField(field)
         f.setAccessible(true)
-        f
+        return f
     }
 }
