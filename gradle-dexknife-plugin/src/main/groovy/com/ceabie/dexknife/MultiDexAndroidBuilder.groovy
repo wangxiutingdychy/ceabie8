@@ -47,7 +47,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         super(projectId, createdBy, processExecutor, javaProcessExecutor, errorReporter, logger, verboseExec)
     }
 
-//    @Override // for < 2.2.0
+    @Override // for < 2.2.0
     public void convertByteCode(Collection<File> inputs,
                                 File outDexFolder,
                                 boolean multidex,
@@ -70,34 +70,6 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
 
         super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
                 additionalParameters, incremental, optimize, processOutputHandler);
-    }
-
-//    @Override for >= 2.2.0
-    public void convertByteCode(Collection<File> inputs,
-                                File outDexFolder,
-                                boolean multidex,
-                                File mainDexList,
-                                final DexOptions dexOptions,
-                                boolean optimize,
-                                ProcessOutputHandler processOutputHandler)
-            throws IOException, InterruptedException, ProcessException {
-
-        println("convertByteCode 2")
-
-        DexOptions dexOptionsProxy = dexOptions;
-
-        if (mAddParams != null) {
-            List<String> additionalParameters = dexOptions.getAdditionalParameters()
-            if (additionalParameters == null) {
-                additionalParameters = []
-            }
-
-            if (mergeParams(additionalParameters)) {
-                dexOptionsProxy = new DexOptionsProxy(dexOptions, additionalParameters)
-            }
-        }
-
-        super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy, optimize, processOutputHandler);
     }
 
     private boolean mergeParams(List<String> params) {

@@ -7,7 +7,6 @@ Supports <= android gradle plugin 2.2.0, above 2.2.0 is in dev branch. Clean bui
 
 Update Log
 ----------
-    1.5.5.alpha: Experimentally support android gradle plugin on 2.2.0, not support < 2.2.0.(实验性的支持 2.2.0 plugin)
     1.5.4: auto disabled when instant run mode.(instant run 模式时自动禁用DexKnife)
     1.5.3: add some track logs and skip DexKnife when jarMerging is null.(增加跟踪日志，并在jarMerging为null跳过处理)
     1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)
@@ -87,7 +86,6 @@ and then, set your app
 
 更新日志
 --------
-    1.5.5.alpha: 实验性的支持 2.2.0 plugin, 不支持 小于2.2.0的版本
     1.5.4: instant run 模式时自动禁用DexKnife
     1.5.3: 增加跟踪日志，并在jarMerging为null时跳过处理
     1.5.2: 修复include和exclude, 并支持过滤单个类
