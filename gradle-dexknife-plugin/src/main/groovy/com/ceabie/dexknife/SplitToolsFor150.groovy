@@ -102,7 +102,7 @@ public class SplitToolsFor150 extends DexSplitTools {
                         fileAdtMainList, dexKnifeConfig)) {
 
                     // 替换 AndroidBuilder
-                    MultiDexAndroidBuilder.proxyAndroidBuilder(dexTransform,
+                    InjectAndroidBuilder.proxyAndroidBuilder(dexTransform,
                             dexKnifeConfig.additionalParameters)
 
                     // 替换这个文件

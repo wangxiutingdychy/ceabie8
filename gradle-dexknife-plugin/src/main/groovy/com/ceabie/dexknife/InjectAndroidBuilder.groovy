@@ -25,6 +25,7 @@ import com.android.ide.common.process.ProcessException
 import com.android.ide.common.process.ProcessExecutor
 import com.android.ide.common.process.ProcessOutputHandler
 import com.android.utils.ILogger
+import groovy.transform.CompileStatic
 
 import java.lang.reflect.Field
 
@@ -33,17 +34,18 @@ import java.lang.reflect.Field
  *
  * @author ceabie
  */
-public class MultiDexAndroidBuilder extends AndroidBuilder {
+public class InjectAndroidBuilder extends AndroidBuilder {
 
     Collection<String> mAddParams;
+    AndroidBuilder mAndroidBuilder;
 
-    public MultiDexAndroidBuilder(String projectId,
-                                  String createdBy,
-                                  ProcessExecutor processExecutor,
-                                  JavaProcessExecutor javaProcessExecutor,
-                                  ErrorReporter errorReporter,
-                                  ILogger logger,
-                                  boolean verboseExec) {
+    public InjectAndroidBuilder(String projectId,
+                                String createdBy,
+                                ProcessExecutor processExecutor,
+                                JavaProcessExecutor javaProcessExecutor,
+                                ErrorReporter errorReporter,
+                                ILogger logger,
+                                boolean verboseExec) {
         super(projectId, createdBy, processExecutor, javaProcessExecutor, errorReporter, logger, verboseExec)
     }
 
@@ -59,7 +61,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                                 ProcessOutputHandler processOutputHandler)
             throws IOException, InterruptedException, ProcessException {
 
-        println("convertByteCode 1")
+        println("DexKnife: convertByteCode before 2.2.0")
         if (mAddParams != null) {
             if (additionalParameters == null) {
                 additionalParameters = []
@@ -68,7 +70,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
             mergeParams(additionalParameters)
         }
 
-        super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
+        mAndroidBuilder.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
                 additionalParameters, incremental, optimize, processOutputHandler);
     }
 
@@ -82,9 +84,9 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                                 ProcessOutputHandler processOutputHandler)
             throws IOException, InterruptedException, ProcessException {
 
-        println("convertByteCode 2")
+        println("DexKnife:convertByteCode after 2.2.0")
 
-        DexOptions dexOptionsProxy = dexOptions;
+        DexOptions dexOptionsProxy = dexOptions
 
         if (mAddParams != null) {
             List<String> additionalParameters = dexOptions.getAdditionalParameters()
@@ -92,16 +94,29 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                 additionalParameters = []
             }
 
-            if (mergeParams(additionalParameters)) {
-                dexOptionsProxy = new DexOptionsProxy(dexOptions, additionalParameters)
-            }
+            mergeParams(additionalParameters)
         }
 
-        super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy, optimize, processOutputHandler);
+        mAndroidBuilder.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy,
+                optimize, processOutputHandler);
     }
 
+    @CompileStatic
+    @Override
+    List<File> getBootClasspath(boolean includeOptionalLibraries) {
+        return mAndroidBuilder.getBootClasspath(includeOptionalLibraries)
+    }
+
+    @CompileStatic
+    @Override
+    List<String> getBootClasspathAsStrings(boolean includeOptionalLibraries) {
+        return mAndroidBuilder.getBootClasspathAsStrings(includeOptionalLibraries)
+    }
+
+
+    @CompileStatic
     private boolean mergeParams(List<String> params) {
-        List<String> mergeParam = []
+        List<String> mergeParam = new ArrayList<>()
         for (String param : mAddParams) {
             if (!params.contains(param)) {
                 mergeParam.add(param)
@@ -116,6 +131,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         return isMerge
     }
 
+
     public static void proxyAndroidBuilder(DexTransform transform, Collection<String> addParams) {
         if (addParams != null && addParams.size() > 0) {
             accessibleField(DexTransform.class, "androidBuilder")
@@ -125,7 +141,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
 
     private static AndroidBuilder getProxyAndroidBuilder(AndroidBuilder orgAndroidBuilder,
                                                          Collection<String> addParams) {
-        MultiDexAndroidBuilder myAndroidBuilder = new MultiDexAndroidBuilder(
+        InjectAndroidBuilder myAndroidBuilder = new InjectAndroidBuilder(
                 orgAndroidBuilder.mProjectId,
                 orgAndroidBuilder.mCreatedBy,
                 orgAndroidBuilder.getProcessExecutor(),
@@ -148,12 +164,14 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         }
 
         myAndroidBuilder.mAddParams = addParams
+        myAndroidBuilder.mAndroidBuilder = orgAndroidBuilder
 //        myAndroidBuilder.mBootClasspathFiltered = orgAndroidBuilder.mBootClasspathFiltered
 //        myAndroidBuilder.mBootClasspathAll = orgAndroidBuilder.mBootClasspathAll
 
         return myAndroidBuilder
     }
 
+    @CompileStatic
     private static Field accessibleField(Class cls, String field) {
         Field f = cls.getDeclaredField(field)
         f.setAccessible(true)
