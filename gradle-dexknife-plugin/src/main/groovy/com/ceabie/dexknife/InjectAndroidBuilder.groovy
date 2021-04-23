@@ -64,12 +64,13 @@ public class InjectAndroidBuilder extends AndroidBuilder {
         println("DexKnife: convertByteCode before 2.2.0")
         if (mAddParams != null) {
             if (additionalParameters == null) {
-                additionalParameters = []
+                additionalParameters = new ArrayList<>()
             }
 
-            mergeParams(additionalParameters)
+            mergeParams(additionalParameters, mAddParams)
         }
 
+        // groovy call super has bug
         mAndroidBuilder.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
                 additionalParameters, incremental, optimize, processOutputHandler);
     }
@@ -91,10 +92,10 @@ public class InjectAndroidBuilder extends AndroidBuilder {
         if (mAddParams != null) {
             List<String> additionalParameters = dexOptions.getAdditionalParameters()
             if (additionalParameters == null) {
-                additionalParameters = []
+                additionalParameters = new ArrayList<>()
             }
 
-            mergeParams(additionalParameters)
+            mergeParams(additionalParameters, mAddParams)
         }
 
         mAndroidBuilder.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy,
@@ -115,20 +116,17 @@ public class InjectAndroidBuilder extends AndroidBuilder {
 
 
     @CompileStatic
-    private boolean mergeParams(List<String> params) {
+    static void mergeParams(List<String> additionalParameters, Collection<String> addParams) {
         List<String> mergeParam = new ArrayList<>()
-        for (String param : mAddParams) {
-            if (!params.contains(param)) {
+        for (String param : addParams) {
+            if (!additionalParameters.contains(param)) {
                 mergeParam.add(param)
             }
         }
 
-        boolean isMerge = mergeParam.size() > 0
-        if (isMerge) {
-            params.addAll(mergeParam)
+        if (mergeParam.size() > 0) {
+            additionalParameters.addAll(mergeParam)
         }
-
-        return isMerge
     }
 
 

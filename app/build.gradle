@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.ceabie.dexnkife'
+if (hasDexKnifePlugin()) {
+    apply plugin: 'com.ceabie.dexnkife'
+}
 
 android {
     compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VER)
@@ -51,4 +53,14 @@ dependencies {
     //    apt 'com.google.dagger:dagger-compiler:2.0'
     compile 'com.android.support:multidex:1.0.1'
     compile project(':lib1')
+}
+
+static boolean hasDexKnifePlugin() {
+    try {
+        Class.forName("com.ceabie.dexknife.DexKnifePlugin")
+        return true
+    } catch (Exception e) {
+    }
+
+    return false
 }
