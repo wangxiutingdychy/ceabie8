@@ -1,12 +1,13 @@
 # DexKnife
 
 A simple android gradle plugin to use the patterns of package to smart split the specified classes to multi dex.<br />
-Supports <= android gradle plugin 2.2.0, above 2.2.0 is in dev branch. Clean build folders after switch branch.
+Also supports android gradle plugin 2.2.0.
 
 - **Notes:Because instant-run of 2.0.0 above is incompatible with multidex, so DexKnife is auto disabled.**
 
 Update Log
 ----------
+    1.5.5.alpha: Experimentally support android gradle plugin on 2.2.0. (实验性的支持 2.2.0 plugin)
     1.5.4: auto disabled when instant run mode.(instant run 模式时自动禁用DexKnife)
     1.5.3: add some track logs and skip DexKnife when jarMerging is null.(增加跟踪日志，并在jarMerging为null跳过处理)
     1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)
@@ -23,8 +24,8 @@ Usage
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.1.3'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.4' // AGP <= 2.2.0
+            classpath 'com.android.tools.build:gradle:2.2.0-beta1'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5.alpha'
         }
     }
 
@@ -80,12 +81,13 @@ and then, set your app
 # 中文
 
 一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。<br />
-只支持 android gradle plugin 小于 2.2.0, 高于 2.2.0 在dev分支中。切换分支后清理build目录
+同时支持 android gradle plugin 2.2.0.
 
 - **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，所以DexKnife自动禁用。**
 
 更新日志
 --------
+    1.5.5.alpha: 实验性的支持 2.2.0 plugin
     1.5.4: instant run 模式时自动禁用DexKnife
     1.5.3: 增加跟踪日志，并在jarMerging为null时跳过处理
     1.5.2: 修复include和exclude, 并支持过滤单个类
@@ -102,8 +104,8 @@ and then, set your app
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.1.3'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.4' // AGP <= 2.2.0
+            classpath 'com.android.tools.build:gradle:2.2.0-beta1'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5.alpha'
         }
     }
 

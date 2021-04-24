@@ -25,6 +25,7 @@ import com.android.ide.common.process.ProcessException
 import com.android.ide.common.process.ProcessExecutor
 import com.android.ide.common.process.ProcessOutputHandler
 import com.android.utils.ILogger
+import groovy.transform.CompileStatic
 
 import java.lang.reflect.Field
 
@@ -33,21 +34,22 @@ import java.lang.reflect.Field
  *
  * @author ceabie
  */
-public class MultiDexAndroidBuilder extends AndroidBuilder {
+public class InjectAndroidBuilder extends AndroidBuilder {
 
     Collection<String> mAddParams;
+    AndroidBuilder mAndroidBuilder;
 
-    public MultiDexAndroidBuilder(String projectId,
-                                  String createdBy,
-                                  ProcessExecutor processExecutor,
-                                  JavaProcessExecutor javaProcessExecutor,
-                                  ErrorReporter errorReporter,
-                                  ILogger logger,
-                                  boolean verboseExec) {
+    public InjectAndroidBuilder(String projectId,
+                                String createdBy,
+                                ProcessExecutor processExecutor,
+                                JavaProcessExecutor javaProcessExecutor,
+                                ErrorReporter errorReporter,
+                                ILogger logger,
+                                boolean verboseExec) {
         super(projectId, createdBy, processExecutor, javaProcessExecutor, errorReporter, logger, verboseExec)
     }
 
-    @Override // for < 2.2.0
+//    @Override // for < 2.2.0
     public void convertByteCode(Collection<File> inputs,
                                 File outDexFolder,
                                 boolean multidex,
@@ -59,34 +61,74 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
                                 ProcessOutputHandler processOutputHandler)
             throws IOException, InterruptedException, ProcessException {
 
-        println("convertByteCode 1")
+        println("DexKnife: convertByteCode before 2.2.0")
         if (mAddParams != null) {
             if (additionalParameters == null) {
-                additionalParameters = []
+                additionalParameters = new ArrayList<>()
             }
 
-            mergeParams(additionalParameters)
+            mergeParams(additionalParameters, mAddParams)
         }
 
-        super.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
+        // groovy call super has bug
+        mAndroidBuilder.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptions,
                 additionalParameters, incremental, optimize, processOutputHandler);
     }
 
-    private boolean mergeParams(List<String> params) {
-        List<String> mergeParam = []
-        for (String param : mAddParams) {
-            if (!params.contains(param)) {
+//    @Override for >= 2.2.0
+    public void convertByteCode(Collection<File> inputs,
+                                File outDexFolder,
+                                boolean multidex,
+                                File mainDexList,
+                                final DexOptions dexOptions,
+                                boolean optimize,
+                                ProcessOutputHandler processOutputHandler)
+            throws IOException, InterruptedException, ProcessException {
+
+        println("DexKnife:convertByteCode after 2.2.0")
+
+        DexOptions dexOptionsProxy = dexOptions
+
+        if (mAddParams != null) {
+            List<String> additionalParameters = dexOptions.getAdditionalParameters()
+            if (additionalParameters == null) {
+                additionalParameters = new ArrayList<>()
+            }
+
+            mergeParams(additionalParameters, mAddParams)
+        }
+
+        mAndroidBuilder.convertByteCode(inputs, outDexFolder, multidex, mainDexList, dexOptionsProxy,
+                optimize, processOutputHandler);
+    }
+
+    @CompileStatic
+    @Override
+    List<File> getBootClasspath(boolean includeOptionalLibraries) {
+        return mAndroidBuilder.getBootClasspath(includeOptionalLibraries)
+    }
+
+    @CompileStatic
+    @Override
+    List<String> getBootClasspathAsStrings(boolean includeOptionalLibraries) {
+        return mAndroidBuilder.getBootClasspathAsStrings(includeOptionalLibraries)
+    }
+
+
+    @CompileStatic
+    static void mergeParams(List<String> additionalParameters, Collection<String> addParams) {
+        List<String> mergeParam = new ArrayList<>()
+        for (String param : addParams) {
+            if (!additionalParameters.contains(param)) {
                 mergeParam.add(param)
             }
         }
 
-        boolean isMerge = mergeParam.size() > 0
-        if (isMerge) {
-            params.addAll(mergeParam)
+        if (mergeParam.size() > 0) {
+            additionalParameters.addAll(mergeParam)
         }
-
-        return isMerge
     }
+
 
     public static void proxyAndroidBuilder(DexTransform transform, Collection<String> addParams) {
         if (addParams != null && addParams.size() > 0) {
@@ -97,7 +139,7 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
 
     private static AndroidBuilder getProxyAndroidBuilder(AndroidBuilder orgAndroidBuilder,
                                                          Collection<String> addParams) {
-        MultiDexAndroidBuilder myAndroidBuilder = new MultiDexAndroidBuilder(
+        InjectAndroidBuilder myAndroidBuilder = new InjectAndroidBuilder(
                 orgAndroidBuilder.mProjectId,
                 orgAndroidBuilder.mCreatedBy,
                 orgAndroidBuilder.getProcessExecutor(),
@@ -120,12 +162,14 @@ public class MultiDexAndroidBuilder extends AndroidBuilder {
         }
 
         myAndroidBuilder.mAddParams = addParams
+        myAndroidBuilder.mAndroidBuilder = orgAndroidBuilder
 //        myAndroidBuilder.mBootClasspathFiltered = orgAndroidBuilder.mBootClasspathFiltered
 //        myAndroidBuilder.mBootClasspathAll = orgAndroidBuilder.mBootClasspathAll
 
         return myAndroidBuilder
     }
 
+    @CompileStatic
     private static Field accessibleField(Class cls, String field) {
         Field f = cls.getDeclaredField(field)
         f.setAccessible(true)
