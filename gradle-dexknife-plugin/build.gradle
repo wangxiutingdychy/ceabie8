@@ -45,7 +45,7 @@ dependencies {
     provided 'com.android.tools.build:gradle-core:2.1.3'
 }
 
-version = '1.5.4'
+version = "${PUBLIC_VERSION}"
 group = 'com.ceabie.dextools'
 
 def pomConfig = {
@@ -94,7 +94,7 @@ bintray {
         issueTrackerUrl = POM_URL + '/issues'
         licenses = ["Apache-2.0"]
         version {
-            name = '1.5.4'
+            name = "${PUBLIC_VERSION}"
             attributes = ['gradle-plugin': 'com.ceabie.dextools:gradle-dexknife-plugin']
         }
     }
@@ -118,7 +118,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: uri('../repo'))
-            pom.version = "1.5.4.dev"
+            pom.version = "${DEV_VERSION}"
             pom.artifactId = "gradle-dexknife-plugin"
             pom.groupId = "com.ceabie.dextools"
         }
