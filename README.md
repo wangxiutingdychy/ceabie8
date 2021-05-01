@@ -46,7 +46,7 @@ Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/Patt
 
 Other config key:
 
-    '#' is the comment.
+    '#' is the comment, config is disabled when '#' adds on line start.
 
     # this path will to be split to second dex.
     android.support.v?.**
@@ -60,8 +60,14 @@ Other config key:
     # do not use suggest of the maindexlist that android gradle plugin generate.
     -donot-use-suggest
 
+    # the configs of split and keep apply with maindexlist, if -donot-use-suggest is DISABLE. (only in code, isn't in any online release version)
+    -filter-suggest
+
     # Notes: Split dex until the dex's id > 65536. --minimal-main-dex is default.
-    # -auto-maindex  # default is not used.
+    -auto-maindex  # default is not used.
+
+    # dex additional parameters, such as --set-max-idx-number=50000
+    -dex-param --set-max-idx-number=50000
 
     # log the main dex classes.
     -log-mainlist
@@ -126,7 +132,7 @@ and then, set your app
 
 其他配置：
 
-    使用 # 进行注释.
+    使用 # 进行注释, 当行起始加上 #, 这行配置被禁用.
 
     # 如果你想要某个包路径在maindex中，则使用 -keep 选项，即使他已经在分包的路径中.
     -keep android.support.v4.view.**
@@ -140,8 +146,14 @@ and then, set your app
     # 不包含Android gradle 插件自动生成的miandex列表.
     -donot-use-suggest
 
+    # 将 split 和 keep配置应用到 adt的maindexlist中, 但 -donot-use-suggest 要关闭.(未加入线上发行版本)
+    -filter-suggest
+
     # 不进行dex分包， 直到 dex 的id数量超过 65536.
-    # -auto-maindex
+    -auto-maindex
+
+    # dex 扩展参数, 例如 --set-max-idx-number=50000
+    -dex-param --set-max-idx-number=50000
 
     # 显示miandex的日志.
     -log-mainlist

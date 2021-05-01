@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -48,12 +49,15 @@ public class DexSplitTools {
 
     private static final String DEX_MINIMAL_MAIN_DEX = "--minimal-main-dex";
 
-    private static final String DEX_KNIFE_CFG_DEX_PARAM = "-dex-param ";
-    private static final String DEX_KNIFE_CFG_SPLIT = "-split ";
-    private static final String DEX_KNIFE_CFG_KEEP = "-keep ";
+    private static final String DEX_KNIFE_CFG_DEX_PARAM = "-dex-param";
+    private static final String DEX_KNIFE_CFG_SPLIT = "-split";
+    private static final String DEX_KNIFE_CFG_KEEP = "-keep";
     private static final String DEX_KNIFE_CFG_AUTO_MAINDEX = "-auto-maindex";
     private static final String DEX_KNIFE_CFG_DONOT_USE_SUGGEST = "-donot-use-suggest";
     private static final String DEX_KNIFE_CFG_LOG_MAIN_DEX = "-log-mainlist";
+    private static final String DEX_KNIFE_CFG_FILTER_SUGGEST = "-filter-suggest";
+    private static final String DEX_KNIFE_CFG_SUGGEST_SPLIT = "-suggest-split";
+    private static final String DEX_KNIFE_CFG_SUGGEST_KEEP = "-suggest-keep";
 
     private static final String MAINDEXLIST_TXT = "maindexlist.txt";
     private static final String MAPPING_FLAG = " -> ";
@@ -111,6 +115,7 @@ public class DexSplitTools {
         Set<String> addParams = new HashSet<>();
 
         String line;
+        boolean matchCmd;
         ArrayList<String> splitToSecond = new ArrayList<>();
         ArrayList<String> keepMain = new ArrayList<>();
 
@@ -130,33 +135,41 @@ public class DexSplitTools {
             }
 
             String cmd = line.toLowerCase();
-
-            System.out.println("DexKnife Config: " + cmd);
+            matchCmd = true;
 
             if (DEX_KNIFE_CFG_AUTO_MAINDEX.equals(cmd)) {
                 minimalMainDex = false;
-            } else if (cmd.startsWith(DEX_KNIFE_CFG_DEX_PARAM)) {
+            } else if (matchCommand(cmd, DEX_KNIFE_CFG_DEX_PARAM)) {
                 String param = line.substring(DEX_KNIFE_CFG_DEX_PARAM.length()).trim();
                 if (!param.toLowerCase().startsWith("--main-dex-list")) {
                     addParams.add(param);
                 }
 
-            } else if (cmd.startsWith(DEX_KNIFE_CFG_SPLIT)) {
+            } else if (matchCommand(cmd, DEX_KNIFE_CFG_SPLIT)) {
                 String sPattern = line.substring(DEX_KNIFE_CFG_SPLIT.length()).trim();
                 addClassFilePath(sPattern, splitToSecond);
 
-            } else if (cmd.startsWith(DEX_KNIFE_CFG_KEEP)) {
+            } else if (matchCommand(cmd, DEX_KNIFE_CFG_KEEP)) {
                 String sPattern = line.substring(DEX_KNIFE_CFG_KEEP.length()).trim();
                 addClassFilePath(sPattern, keepMain);
 
             } else if (DEX_KNIFE_CFG_DONOT_USE_SUGGEST.equals(cmd)) {
                 dexKnifeConfig.useSuggest = false;
 
+            } else if (DEX_KNIFE_CFG_FILTER_SUGGEST.equals(cmd)) {
+                dexKnifeConfig.filterSuggest = true;
+
             } else if (DEX_KNIFE_CFG_LOG_MAIN_DEX.equals(cmd)) {
                 dexKnifeConfig.logMainList = true;
 
             } else if (!cmd.startsWith("-")) {
                 addClassFilePath(line, splitToSecond);
+            } else {
+                matchCmd = false;
+            }
+
+            if (matchCmd) {
+                System.out.println("DexKnife Config: " + cmd);
             }
         }
 
@@ -179,6 +192,11 @@ public class DexSplitTools {
         dexKnifeConfig.additionalParameters = addParams;
 
         return dexKnifeConfig;
+    }
+
+    private static boolean matchCommand(String text, String cmd) {
+        Pattern pattern = Pattern.compile("^" + cmd + "\\s+");
+        return pattern.matcher(text).find();
     }
 
     /**
@@ -238,7 +256,8 @@ public class DexSplitTools {
         // get the adt's maindexlist
         HashSet<String> mainCls = null;
         if (dexKnifeConfig.useSuggest) {
-            mainCls = getAdtMainDexClasses(andMainDexList);
+            mainCls = getAdtMainDexClasses(andMainDexList,
+                    dexKnifeConfig.filterSuggest? dexKnifeConfig.patternSet: null);
             System.out.println("DexKnife: use suggest");
         }
 
@@ -348,7 +367,8 @@ public class DexSplitTools {
     /**
      * get the maindexlist of android gradle plugin
      */
-    private static HashSet<String> getAdtMainDexClasses(File outputDir) throws Exception {
+    private static HashSet<String> getAdtMainDexClasses(File outputDir, PatternSet mainDexPattern)
+            throws Exception {
         if (outputDir == null || !outputDir.exists()) {
             System.err.println("DexKnife Warning: Android recommand Main dex is no exist, try run again!");
             return null;
@@ -357,10 +377,25 @@ public class DexSplitTools {
         HashSet<String> mainCls = new HashSet<>();
         BufferedReader reader = new BufferedReader(new FileReader(outputDir));
 
-        String line;
+        ClassFileTreeElement treeElement = new ClassFileTreeElement();
+        Spec<FileTreeElement> asSpec = mainDexPattern != null? getMaindexSpec(mainDexPattern): null;
+
+        String line, clsPath;
         while ((line = reader.readLine()) != null) {
             line = line.trim();
-            if (line.endsWith(CLASS_SUFFIX)) {
+            int clsPos = line.lastIndexOf(CLASS_SUFFIX);
+            if (clsPos != -1) {
+                if (asSpec != null) {
+                    clsPath = line.substring(0, clsPos).replace('.', '/') + CLASS_SUFFIX;
+                    treeElement.setClassPath(clsPath);
+
+                    boolean satisfiedBy = asSpec.isSatisfiedBy(treeElement);
+                    if (!satisfiedBy) {
+                        continue;
+                    }
+                    System.out.println("filter suggest: " + clsPath);
+                }
+
                 mainCls.add(line);
             }
         }

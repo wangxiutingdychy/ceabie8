@@ -1,5 +1,8 @@
 # do not use suggest of the maindexlist that android gradle plugin generate.
--donot-use-suggest
+#-donot-use-suggest
+
+# the configs of split and keep apply with maindexlist, if -donot-use-suggest is DISABLE.
+#-filter-suggest
 
 # without --minimal-main-dex, only spliting at dex id > 65536 . --minimal-main-dex is default
 #-auto-maindex
