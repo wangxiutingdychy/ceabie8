@@ -30,7 +30,6 @@ configurations {
     compile.extendsFrom provided
 }
 
-
 //sourceSets {
 //    main {
 //        compileClasspath += configurations.provided

@@ -48,6 +48,7 @@ public class DexSplitTools {
     private static final String DEX_KNIFE_CFG_FILTER_SUGGEST = "-filter-suggest";
     private static final String DEX_KNIFE_CFG_SUGGEST_SPLIT = "-suggest-split";
     private static final String DEX_KNIFE_CFG_SUGGEST_KEEP = "-suggest-keep";
+    private static final String DEX_KNIFE_CFG_LOG_FILTER_SUGGEST = "-log-filter-suggest";
 
     private static final String MAINDEXLIST_TXT = "maindexlist.txt";
     private static final String MAPPING_FLAG = " -> ";
@@ -105,10 +106,10 @@ public class DexSplitTools {
         boolean minimalMainDex = true;
         Set<String> addParams = new HashSet<>();
 
-        List<String> splitToSecond = new ArrayList<>();
-        List<String> keepMain = new ArrayList<>();
-        List<String> splitSuggest = new ArrayList<>();
-        List<String> keepSuggest = new ArrayList<>();
+        Set<String> splitToSecond = new HashSet<>();
+        Set<String> keepMain = new HashSet<>();
+        Set<String> splitSuggest = new HashSet<>();
+        Set<String> keepSuggest = new HashSet<>();
 
         while ((line = reader.readLine()) != null) {
             line = line.trim();
@@ -153,7 +154,10 @@ public class DexSplitTools {
             } else if (DEX_KNIFE_CFG_LOG_MAIN_DEX.equals(cmd)) {
                 dexKnifeConfig.logMainList = true;
 
-            } else if (matchCommand(cmd, DEX_KNIFE_CFG_SUGGEST_SPLIT)) {
+            }  else if (DEX_KNIFE_CFG_LOG_FILTER_SUGGEST.equals(cmd)) {
+                dexKnifeConfig.logFilterSuggest = true;
+
+            }else if (matchCommand(cmd, DEX_KNIFE_CFG_SUGGEST_SPLIT)) {
                 String sPattern = line.substring(DEX_KNIFE_CFG_SUGGEST_SPLIT.length()).trim();
                 addClassFilePath(sPattern, splitSuggest);
 
@@ -168,7 +172,7 @@ public class DexSplitTools {
             }
 
             if (matchCmd) {
-                System.out.println("DexKnife Config: " + cmd);
+                System.out.println("DexKnife Config: " + line);
             }
         }
 
@@ -184,6 +188,10 @@ public class DexSplitTools {
                 keepSuggest.addAll(keepMain);
             }
 
+            for (String s : splitSuggest) {
+                System.out.println("Suggest: " + s);
+            }
+
             if (!splitSuggest.isEmpty() || !keepSuggest.isEmpty()) {
                 dexKnifeConfig.suggestPatternSet = new PatternSet()
                         .exclude(splitSuggest)
@@ -193,6 +201,9 @@ public class DexSplitTools {
 
 
         if (!splitToSecond.isEmpty() || !keepMain.isEmpty()) {
+            for (String s : splitToSecond) {
+                System.out.println(s);
+            }
             dexKnifeConfig.patternSet = new PatternSet()
                     .exclude(splitToSecond)
                     .include(keepMain);
@@ -214,7 +225,7 @@ public class DexSplitTools {
     /**
      * add the class path to pattern list, and the single class pattern can work.
      */
-    private static void addClassFilePath(String classPath, List<String> patternList) {
+    private static void addClassFilePath(String classPath, Set<String> patternList) {
         if (classPath != null && classPath.length() > 0) {
             if (classPath.endsWith(CLASS_SUFFIX)) {
                 classPath = classPath.substring(0, classPath.length() - CLASS_SUFFIX.length())
@@ -269,15 +280,12 @@ public class DexSplitTools {
         HashSet<String> mainCls = null;
         if (dexKnifeConfig.useSuggest) {
 
-            PatternSet patternSet = null;
-            if (dexKnifeConfig.filterSuggest) {
-                patternSet = dexKnifeConfig.suggestPatternSet;
-                if (patternSet == null) {
-                    patternSet = dexKnifeConfig.patternSet;
-                }
+            PatternSet patternSet = dexKnifeConfig.suggestPatternSet;
+            if (dexKnifeConfig.filterSuggest && patternSet == null) {
+                patternSet = dexKnifeConfig.patternSet;
             }
 
-            mainCls = getAdtMainDexClasses(andMainDexList, patternSet);
+            mainCls = getAdtMainDexClasses(andMainDexList, patternSet, dexKnifeConfig.logFilterSuggest);
             System.out.println("DexKnife: use suggest");
         }
 
@@ -397,7 +405,7 @@ public class DexSplitTools {
     /**
      * get the maindexlist of android gradle plugin
      */
-    private static HashSet<String> getAdtMainDexClasses(File outputDir, PatternSet mainDexPattern)
+    private static HashSet<String> getAdtMainDexClasses(File outputDir, PatternSet mainDexPattern, boolean logFilter)
             throws Exception {
         if (outputDir == null || !outputDir.exists()) {
             System.err.println("DexKnife Warning: Android recommand Main dex is no exist, try run again!");
@@ -421,11 +429,11 @@ public class DexSplitTools {
 
                     boolean satisfiedBy = asSpec.isSatisfiedBy(treeElement);
                     if (!satisfiedBy) {
-                        System.out.println("DexKnife: Split Suggest: " + clsPath);
+                        if (logFilter) System.out.println("DexKnife-Suggest: [Split] " + clsPath);
                         continue;
                     }
 
-                    System.out.println("DexKnife: Keep Suggest: " + clsPath);
+                    if (logFilter) System.out.println("DexKnife-Suggest: [Keep]  " + clsPath);
                 }
 
                 mainCls.add(line);

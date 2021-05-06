@@ -42,15 +42,18 @@ Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErr
     Either '.' or '/' may be used in a pattern to separate directories.
     Patterns ending with '.' or '/' will have '**' automatically appended.
 
-Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
+Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
+
+**Note: if you want to filter the inner classes, use $\*, such as: SomeClass$\*.class <br />**
 
 Other config key:
 
     '#' is the comment, config is disabled when '#' adds on line start.
-
+ 
+    # Global filter, don't apply with suggest maindexlist if -filter-suggest is DISABLE.
     # this path will to be split to second dex.
     android.support.v?.**
-
+    
     # if you want to keep some classes in main dex, use '-keep'.
     -keep android.support.v4.view.**
 
@@ -60,7 +63,7 @@ Other config key:
     # do not use suggest of the maindexlist that android gradle plugin generate.
     -donot-use-suggest
 
-    # the configs of split and keep apply with maindexlist, if -donot-use-suggest is DISABLE. (only in code, isn't in any online release version)
+    # the global filter apply with maindexlist, if -donot-use-suggest is DISABLE. (only in code, isn't in any online release version)
     -filter-suggest
 
     # Notes: Split dex until the dex's id > 65536. --minimal-main-dex is default.
@@ -72,6 +75,14 @@ Other config key:
     # log the main dex classes.
     -log-mainlist
 
+    # log the filter classes of suggest maindexlist, if -filter-suggest is enabled..
+    -log-filter-suggest
+    
+    # if you only filter the suggest maindexlist, use -suggest-split and -suggest-keep.
+    # Global filter will merge into them if -filter-suggest is ENABLE sametime .
+    -suggest-split **.MainActivity2.class
+    -suggest-keep android.support.multidex.**
+    
 3、add to your app's build.gradle, add this line:
 
     apply plugin: 'com.ceabie.dexnkife'
@@ -128,12 +139,15 @@ and then, set your app
     Either '.' or '/' may be used in a pattern to separate directories.
     Patterns ending with '.' or '/' will have '**' automatically appended.
 
-更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html
+更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
+
+**注意: 如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class ** <br />
 
 其他配置：
 
     使用 # 进行注释, 当行起始加上 #, 这行配置被禁用.
 
+    # 全局过滤, 如果没设置 -filter-suggest 并不会应用到 建议的maindexlist.
     # 如果你想要某个包路径在maindex中，则使用 -keep 选项，即使他已经在分包的路径中.
     -keep android.support.v4.view.**
 
@@ -146,7 +160,7 @@ and then, set your app
     # 不包含Android gradle 插件自动生成的miandex列表.
     -donot-use-suggest
 
-    # 将 split 和 keep配置应用到 adt的maindexlist中, 但 -donot-use-suggest 要关闭.(未加入线上发行版本)
+    # 将 全局过滤配置应用到 建议的maindexlist中, 但 -donot-use-suggest 要关闭.(未加入线上发行版本)
     -filter-suggest
 
     # 不进行dex分包， 直到 dex 的id数量超过 65536.
@@ -157,6 +171,11 @@ and then, set your app
 
     # 显示miandex的日志.
     -log-mainlist
+    
+    # 如果你只想过滤 建议的maindexlist, 使用 -suggest-split 和 -suggest-keep.
+    # 如果同时启用 -filter-suggest, 全局过滤会合并到它们中.
+    -suggest-split **.MainActivity2.class
+    -suggest-keep android.support.multidex.**
 
 
 3、在你的App模块的build.gradle 增加：
