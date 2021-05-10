@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import demo.ceabie.com.demo.R;
+import ceabie.com.demo.R;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_save_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int dfg = 121111;
+                int dfg = 1211111111;
                 Observable.just(1, 2, dfg)
                         .map(new Func1<Integer, Integer>() {
                             @Override

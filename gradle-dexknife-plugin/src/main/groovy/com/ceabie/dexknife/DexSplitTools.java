@@ -188,9 +188,9 @@ public class DexSplitTools {
                 keepSuggest.addAll(keepMain);
             }
 
-            for (String s : splitSuggest) {
-                System.out.println("Suggest: " + s);
-            }
+//            for (String s : splitSuggest) {
+//                System.out.println("Suggest: " + s);
+//            }
 
             if (!splitSuggest.isEmpty() || !keepSuggest.isEmpty()) {
                 dexKnifeConfig.suggestPatternSet = new PatternSet()
@@ -201,9 +201,9 @@ public class DexSplitTools {
 
 
         if (!splitToSecond.isEmpty() || !keepMain.isEmpty()) {
-            for (String s : splitToSecond) {
-                System.out.println(s);
-            }
+//            for (String s : splitToSecond) {
+//                System.out.println(s);
+//            }
             dexKnifeConfig.patternSet = new PatternSet()
                     .exclude(splitToSecond)
                     .include(keepMain);

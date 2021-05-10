@@ -31,6 +31,6 @@ android.support.v?.**
 
 # if you only filter the suggest maindexlist, use -suggest-split and -suggest-keep.
 # It will merge global filter if -filter-suggest is ENABLE.
--suggest-split **.MainActivity2.class
--suggest-split **.MainActivity2$*.class
+#-suggest-split **.MainActivity2.class
+#-suggest-split **.MainActivity2$*.class
 #-suggest-keep android.support.multidex.**

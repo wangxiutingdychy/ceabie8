@@ -1,12 +1,14 @@
+[![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) 
+
 # DexKnife
 
-A simple android gradle plugin to use the patterns of package to smart split the specified classes to multi dex.<br />
-Also supports android gradle plugin 2.2.0.
+>A simple android gradle plugin to use the patterns of package to smart split the specified classes to multi dex.<br />
+Also supports android gradle plugin 2.2.0 multidex.
 
 - **Notes:Because instant-run of 2.0.0 above is incompatible with multidex, so DexKnife is auto disabled.**
 
-Update Log
-----------
+###Update Log
+    1.5.5: support individual filter for suggest maindexlist. (单独的maindexlist过滤设置)
     1.5.5.alpha: Experimentally support android gradle plugin on 2.2.0. (实验性的支持 2.2.0 plugin)
     1.5.4: auto disabled when instant run mode.(instant run 模式时自动禁用DexKnife)
     1.5.3: add some track logs and skip DexKnife when jarMerging is null.(增加跟踪日志，并在jarMerging为null跳过处理)
@@ -14,10 +16,8 @@ Update Log
     1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）
     1.5.1: fix the proguard mode
 
-Usage
---------
-
-1、In your project's build.gradle, buildscript.
+###Usage
+1.In your project's build.gradle, buildscript.
 
     buildscript {
             ....
@@ -32,7 +32,7 @@ Usage
 **please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as:<br />
 Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2、Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.
+2.Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.
 
     Patterns may include:
 
@@ -83,7 +83,7 @@ Other config key:
     -suggest-split **.MainActivity2.class
     -suggest-keep android.support.multidex.**
     
-3、add to your app's build.gradle, add this line:
+3.add to your app's build.gradle, add this line:
 
     apply plugin: 'com.ceabie.dexnkife'
 
@@ -93,17 +93,17 @@ and then, set your app
 
    - **Notes: You want to set 'multiDexEnabled true' in 'defaultConfig' or 'buildTypes', otherwise ineffective.**
 
-4、run your app
+4.run your app
 
 # 中文
 
-一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。<br />
-同时支持 android gradle plugin 2.2.0.
+>一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。<br />
+同时支持 android gradle plugin 2.2.0 multidex.
 
 - **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，所以DexKnife自动禁用。**
 
-更新日志
---------
+###更新日志
+    1.5.5: 增加单独的maindexlist过滤设置
     1.5.5.alpha: 实验性的支持 2.2.0 plugin
     1.5.4: instant run 模式时自动禁用DexKnife
     1.5.3: 增加跟踪日志，并在jarMerging为null时跳过处理
@@ -111,10 +111,8 @@ and then, set your app
     1.5.1.exp: 实验性的支持 2.1.0 plugin
     1.5.1: fix the proguard mode
 
-使用方法
---------
-
-1、在你的工程的 build.gradle 中 buildscript:
+###使用方法
+1.在你的工程的 build.gradle 中 buildscript:
 
     buildscript {
             ....
@@ -129,7 +127,7 @@ and then, set your app
  **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：<br />
       Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2、在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
+2.在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
 
     Patterns may include:
 
@@ -141,7 +139,7 @@ and then, set your app
 
 更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
 
-**注意: 如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class ** <br />
+**注意: 如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class <br />**
 
 其他配置：
 
@@ -177,8 +175,7 @@ and then, set your app
     -suggest-split **.MainActivity2.class
     -suggest-keep android.support.multidex.**
 
-
-3、在你的App模块的build.gradle 增加：
+3.在你的App模块的build.gradle 增加：
 
     apply plugin: 'com.ceabie.dexnkife'
 
@@ -188,7 +185,7 @@ and then, set your app
 
    - **注意：要在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用。**
 
-4、编译你的应用
+4.编译你的应用
 
 ## License
 
