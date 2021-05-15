@@ -24,8 +24,8 @@ Also supports android gradle plugin 2.2.0 multidex.
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.2.0-beta1'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5.alpha'
+            classpath 'com.android.tools.build:gradle:2.2.0-beta2'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5'
         }
     }
 
@@ -119,8 +119,8 @@ and then, set your app
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.2.0-beta1'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5.alpha'
+            classpath 'com.android.tools.build:gradle:2.2.0-beta2'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5'
         }
     }
 
