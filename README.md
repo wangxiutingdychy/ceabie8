@@ -1,4 +1,6 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Download](https://api.bintray.com/packages/ceabie/gradle-plugins/gradle-dexknife-plugin/images/download.svg)](https://bintray.com/ceabie/gradle-plugins/gradle-dexknife-plugin/_latestVersion)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-DexKnifePlugin-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/4001)
 
 # DexKnife
 
@@ -63,7 +65,7 @@ Other config key:
     # do not use suggest of the maindexlist that android gradle plugin generate.
     -donot-use-suggest
 
-    # the global filter apply with maindexlist, if -donot-use-suggest is DISABLE. (only in code, isn't in any online release version)
+    # the global filter apply with maindexlist, if -donot-use-suggest is DISABLE.
     -filter-suggest
 
     # Notes: Split dex until the dex's id > 65536. --minimal-main-dex is default.
@@ -79,7 +81,7 @@ Other config key:
     -log-filter-suggest
     
     # if you only filter the suggest maindexlist, use -suggest-split and -suggest-keep.
-    # Global filter will merge into them if -filter-suggest is ENABLE sametime .
+    # Global filter will merge into them if -filter-suggest is ENABLE at same time.
     -suggest-split **.MainActivity2.class
     -suggest-keep android.support.multidex.**
     
@@ -158,7 +160,7 @@ and then, set your app
     # 不包含Android gradle 插件自动生成的miandex列表.
     -donot-use-suggest
 
-    # 将 全局过滤配置应用到 建议的maindexlist中, 但 -donot-use-suggest 要关闭.(未加入线上发行版本)
+    # 将 全局过滤配置应用到 建议的maindexlist中, 但 -donot-use-suggest 要关闭.
     -filter-suggest
 
     # 不进行dex分包， 直到 dex 的id数量超过 65536.
