@@ -7,7 +7,8 @@
 >A simple android gradle plugin to use the patterns of package to smart split the specified classes to multi dex.<br />
 Also supports android gradle plugin 2.2.0 multidex.
 
-- **Notes:Because instant-run of 2.0.0 above is incompatible with multidex, so DexKnife is auto disabled.**
+- **Notes: Because instant-run of 2.0.0 above is incompatible with multidex, DexKnife is auto disabled when instant-run mode.
+It will auto enable when disabled instant-run or in packaging release.**
 
 ###Update Log
     1.5.5: support individual filter for suggest maindexlist. (单独的maindexlist过滤设置)
@@ -102,7 +103,7 @@ and then, set your app
 >一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。<br />
 同时支持 android gradle plugin 2.2.0 multidex.
 
-- **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，所以DexKnife自动禁用。**
+- **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，DexKnife会暂时禁用。当instant-run被禁用或者release打包时会自动启用。**
 
 ###更新日志
     1.5.5: 增加单独的maindexlist过滤设置
