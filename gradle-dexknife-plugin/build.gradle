@@ -30,6 +30,12 @@ configurations {
     compile.extendsFrom provided
 }
 
+compileGroovy {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+    options.encoding = "UTF-8"
+}
+
 //sourceSets {
 //    main {
 //        compileClasspath += configurations.provided

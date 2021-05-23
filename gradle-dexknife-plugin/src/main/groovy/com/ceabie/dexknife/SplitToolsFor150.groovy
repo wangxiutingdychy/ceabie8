@@ -106,11 +106,6 @@ public class SplitToolsFor150 extends DexSplitTools {
                     println("DexKnife: AndroidPluginVersion: " + version)
 
                     // after 2.2.0, it can additionalParameters, but it is a copy in task
-//                    if (version >= 220) {
-//                        DexOptions dexOptions = project.android.dexOptions;
-//                        InjectAndroidBuilder.mergeParams(dexOptions.getAdditionalParameters(),
-//                                dexKnifeConfig.additionalParameters)
-//                    }
 
                     // 替换 AndroidBuilder
                     InjectAndroidBuilder.proxyAndroidBuilder(dexTransform,

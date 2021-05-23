@@ -256,12 +256,16 @@ public class DexSplitTools {
             if (includeSpec != null && excludeSpec != null) {
                 maindexSpec = Specs.or(includeSpec, Specs.not(excludeSpec));
             } else {
-                maindexSpec = excludeSpec != null? Specs.not(excludeSpec): includeSpec;
+                if (excludeSpec == null) {
+                    maindexSpec = Specs.satisfyAll();
+                } else {
+                    maindexSpec = Specs.not(excludeSpec);
+                }
             }
         }
 
         if (maindexSpec == null) {
-            maindexSpec = Specs.satisfyNone();
+            maindexSpec = Specs.satisfyAll();
         }
 
         return maindexSpec;

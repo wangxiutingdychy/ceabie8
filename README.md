@@ -11,6 +11,7 @@ Also supports android gradle plugin 2.2.0 multidex.
 It will auto enable when disabled instant-run or in packaging release.**
 
 ###Update Log
+    1.5.6: Experimentally support java 1.7, fix nothing is selected when only -keep. (实验性的支持java 1.7,修复但只有keep选项时没有类被选中)
     1.5.5: support individual filter for suggest maindexlist. (单独的maindexlist过滤设置)
     1.5.5.alpha: Experimentally support android gradle plugin on 2.2.0. (实验性的支持 2.2.0 plugin)
     1.5.4: auto disabled when instant run mode.(instant run 模式时自动禁用DexKnife)
@@ -28,7 +29,7 @@ It will auto enable when disabled instant-run or in packaging release.**
         dependencies {
             ....
             classpath 'com.android.tools.build:gradle:2.2.0-beta2'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5'
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.6'
         }
     }
 
@@ -106,6 +107,7 @@ and then, set your app
 - **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，DexKnife会暂时禁用。当instant-run被禁用或者release打包时会自动启用。**
 
 ###更新日志
+    1.5.6: 实验性的支持java 1.7,修复但只有keep选项时没有类被选中
     1.5.5: 增加单独的maindexlist过滤设置
     1.5.5.alpha: 实验性的支持 2.2.0 plugin
     1.5.4: instant run 模式时自动禁用DexKnife
@@ -123,7 +125,7 @@ and then, set your app
         dependencies {
             ....
             classpath 'com.android.tools.build:gradle:2.2.0-beta2'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.5'
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.6'
         }
     }
 
