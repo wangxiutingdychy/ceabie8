@@ -74,6 +74,7 @@ Other config key:
     -auto-maindex  # default is not used.
 
     # dex additional parameters, such as --set-max-idx-number=50000
+    # if number is too small, it will cause DexException: Too many classes in --main-dex-list, main dex capacity exceeded
     -dex-param --set-max-idx-number=50000
 
     # log the main dex classes.
@@ -170,6 +171,7 @@ and then, set your app
     -auto-maindex
 
     # dex 扩展参数, 例如 --set-max-idx-number=50000
+    # 如果出现 DexException: Too many classes in --main-dex-list, main dex capacity exceeded，则需要调大数值
     -dex-param --set-max-idx-number=50000
 
     # 显示miandex的日志.
