@@ -90,8 +90,14 @@ public class DexSplitTools {
             return false;
         }
 
-        return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
-                andMainDexList, dexKnifeConfig);
+        try {
+            return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
+                    andMainDexList, dexKnifeConfig);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     /**
@@ -281,7 +287,7 @@ public class DexSplitTools {
         System.out.println(":" + project.getName() + ":genMainDexList");
 
         // get the adt's maindexlist
-        HashSet<String> mainCls = null;
+        Map<String, Boolean> mainCls = null;
         if (dexKnifeConfig.useSuggest) {
 
             PatternSet patternSet = dexKnifeConfig.suggestPatternSet;
@@ -296,7 +302,7 @@ public class DexSplitTools {
         File keepFile = project.file(MAINDEXLIST_TXT);
         keepFile.delete();
 
-        ArrayList<String> mainClasses = null;
+        List<String> mainClasses = null;
         if (minifyEnabled) {
             System.err.println("DexKnife: From Mapping");
             // get classes from mapping
@@ -332,7 +338,7 @@ public class DexSplitTools {
     }
 
     private static ArrayList<String> getMainClassesFromJar(
-            File jarMergingOutputFile, PatternSet mainDexPattern, HashSet<String> mainCls) throws Exception {
+            File jarMergingOutputFile, PatternSet mainDexPattern, Map<String, Boolean> mainCls) throws Exception {
         ZipFile clsFile = new ZipFile(jarMergingOutputFile);
         Spec<FileTreeElement> asSpec = getMaindexSpec(mainDexPattern);
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
@@ -346,8 +352,7 @@ public class DexSplitTools {
             if (entryName.endsWith(CLASS_SUFFIX)) {
                 treeElement.setClassPath(entryName);
 
-                if (asSpec.isSatisfiedBy(treeElement)
-                        || (mainCls != null && mainCls.contains(entryName))) {
+                if (isAtMainDex(mainCls, entryName, treeElement, asSpec)) {
                     mainDexList.add(entryName);
                 }
             }
@@ -368,16 +373,16 @@ public class DexSplitTools {
      * @throws Exception the exception
      * @author ceabie
      */
-    private static ArrayList<String> getMainClassesFromMapping(
+    private static List<String> getMainClassesFromMapping(
             File mapping,
             PatternSet mainDexPattern,
-            HashSet<String> mainCls) throws Exception {
+            Map<String, Boolean> mainCls) throws Exception {
 
         String line;
-        ArrayList<String> mainDexList = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new FileReader(mapping));
+        List<String> mainDexList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(mapping)); // all classes
 
-        ClassFileTreeElement treeElement = new ClassFileTreeElement();
+        ClassFileTreeElement filterElement = new ClassFileTreeElement();
         Spec<FileTreeElement> asSpec = getMaindexSpec(mainDexPattern);
 
         while ((line = reader.readLine()) != null) {
@@ -386,16 +391,14 @@ public class DexSplitTools {
             if (line.endsWith(":")) {
                 int flagPos = line.indexOf(MAPPING_FLAG);
                 if (flagPos != -1) {
+                    String sOrgCls = line.substring(0, flagPos).replace('.', '/') + CLASS_SUFFIX;
+                    String sMapCls = line.substring(flagPos + MAPPING_FLAG_LEN, line.length() - 1)
+                            .replace('.', '/') + CLASS_SUFFIX;
 
-                    String sOrg = line.substring(0, flagPos).replace('.', '/') + CLASS_SUFFIX;
-                    treeElement.setClassPath(sOrg);
+                    filterElement.setClassPath(sOrgCls);
 
-                    if (asSpec.isSatisfiedBy(treeElement)
-                            || (mainCls != null && mainCls.contains(sOrg))) {
-                        String sMap = line.substring(flagPos + MAPPING_FLAG_LEN, line.length() - 1)
-                                .replace('.', '/') + CLASS_SUFFIX;
-
-                        mainDexList.add(sMap);
+                    if (isAtMainDex(mainCls, sMapCls, filterElement, asSpec)) {
+                        mainDexList.add(sMapCls);
                     }
                 }
             }
@@ -406,17 +409,31 @@ public class DexSplitTools {
         return mainDexList;
     }
 
+    private static boolean isAtMainDex(Map<String, Boolean> mainCls,
+                                       String sCls, ClassFileTreeElement treeElement,
+                                       Spec<FileTreeElement> asSpec) {
+        if (mainCls != null) {
+            Boolean inAdtList = mainCls.get(sCls);
+            if (inAdtList != null) {
+                return inAdtList;
+            }
+        }
+
+        return asSpec.isSatisfiedBy(treeElement);
+    }
+
     /**
-     * get the maindexlist of android gradle plugin
+     * get the maindexlist of android gradle plugin.
+     * if enable ProGuard, return the mapped class.
      */
-    private static HashSet<String> getAdtMainDexClasses(File outputDir, PatternSet mainDexPattern, boolean logFilter)
+    private static Map<String, Boolean> getAdtMainDexClasses(File outputDir, PatternSet mainDexPattern, boolean logFilter)
             throws Exception {
         if (outputDir == null || !outputDir.exists()) {
             System.err.println("DexKnife Warning: Android recommand Main dex is no exist, try run again!");
             return null;
         }
 
-        HashSet<String> mainCls = new HashSet<>();
+        HashMap<String, Boolean> mainCls = new HashMap<>();
         BufferedReader reader = new BufferedReader(new FileReader(outputDir));
 
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
@@ -427,20 +444,20 @@ public class DexSplitTools {
             line = line.trim();
             int clsPos = line.lastIndexOf(CLASS_SUFFIX);
             if (clsPos != -1) {
+                boolean satisfiedBy = true;
+
                 if (asSpec != null) {
                     clsPath = line.substring(0, clsPos).replace('.', '/') + CLASS_SUFFIX;
                     treeElement.setClassPath(clsPath);
 
-                    boolean satisfiedBy = asSpec.isSatisfiedBy(treeElement);
-                    if (!satisfiedBy) {
-                        if (logFilter) System.out.println("DexKnife-Suggest: [Split] " + clsPath);
-                        continue;
+                    satisfiedBy = asSpec.isSatisfiedBy(treeElement);
+                    if (logFilter) {
+                        System.out.println("DexKnife-Suggest: [" +
+                                (satisfiedBy? "Keep": "Split") + "]  " + clsPath);
                     }
-
-                    if (logFilter) System.out.println("DexKnife-Suggest: [Keep]  " + clsPath);
                 }
 
-                mainCls.add(line);
+                mainCls.put(line, satisfiedBy);
             }
         }
 
