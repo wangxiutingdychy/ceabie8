@@ -11,6 +11,7 @@ Also supports android gradle plugin 2.2.0 multidex.
 It will auto enable when disabled instant-run or in packaging release.**
 
 ###Update Log
+    1.5.7: fix support-split and support-keep are not work. (修复support-split/support-keep无效的bug)
     1.5.6: Experimentally support java 1.7, fix nothing is selected when only -keep. (实验性的支持java 1.7,修复但只有keep选项时没有类被选中)
     1.5.5: support individual filter for suggest maindexlist. (单独的maindexlist过滤设置)
     1.5.5.alpha: Experimentally support android gradle plugin on 2.2.0. (实验性的支持 2.2.0 plugin)
@@ -28,8 +29,8 @@ It will auto enable when disabled instant-run or in packaging release.**
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.2.0-beta2'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.6'
+            classpath 'com.android.tools.build:gradle:2.2.0'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.7'
         }
     }
 
@@ -102,12 +103,13 @@ and then, set your app
 
 # 中文
 
->一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。<br />
+>一个简单的将指定使用通配符包名分包到第二个dex中gradle插件。(使用疑问查看 特性)<br />
 同时支持 android gradle plugin 2.2.0 multidex.
 
 - **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，DexKnife会暂时禁用。当instant-run被禁用或者release打包时会自动启用。**
 
 ###更新日志
+    1.5.7: 修复support-split/support-keep无效的bug
     1.5.6: 实验性的支持java 1.7,修复但只有keep选项时没有类被选中
     1.5.5: 增加单独的maindexlist过滤设置
     1.5.5.alpha: 实验性的支持 2.2.0 plugin
@@ -117,6 +119,20 @@ and then, set your app
     1.5.1.exp: 实验性的支持 2.1.0 plugin
     1.5.1: fix the proguard mode
 
+###特性
+1. DexKnife只负责由配置的 类路径通配符 -> maindexlist 文件的转换，**不参与**其他的处理 和 编译过程。非全自动工具，需要对maindexlist特性有较深的了解。
+2. 如果出现运行时类找不到（i.e. class no def/found），请打开DexKnife的log功能，比对调试下DexKnife或ProGuard配置，检查生成的maindexlist是否匹配你的配置。**不要将在Application中使用被分到第二个dex中的类**。（即使不使用DexKnife，手动配置maindexlist也会出现这个样的问题）
+3. DexKnife只能明确指定第一个dex中的类，不能明确指定第二个dex以后的类（dex的maindexlist限制）。如果需要完全手动配置第一个dex，使用<br />
+        -donot-use-suggest
+        -split **
+        -keep android.support.multidex.** # 保证 multidex 或者你自己开发的multidex
+        -keep # 配置你的keep类的通配符，但数量不能超界
+    
+4. DexKnife不带有依赖检测，需要你手动配置，因为DexKnife并不知道你的项目需求。
+5. DexKnife使用原始类路径作为配置，不要使用混淆后的类路径。
+6. -keep 的类所产生的ID数量不能超过65535，否则会出现 Too many classes 的错误。
+
+
 ###使用方法
 1.在你的工程的 build.gradle 中 buildscript:
 
@@ -125,8 +141,8 @@ and then, set your app
 
         dependencies {
             ....
-            classpath 'com.android.tools.build:gradle:2.2.0-beta2'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.6'
+            classpath 'com.android.tools.build:gradle:2.2.0'  // or other
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.7'
         }
     }
 
@@ -145,7 +161,9 @@ and then, set your app
 
 更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
 
-**注意: 如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class <br />**
+**注意: <br />
+如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class <br />
+过滤的类路径使用非混淆的。<br />**
 
 其他配置：
 
@@ -193,6 +211,8 @@ and then, set your app
    - **注意：要在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用。**
 
 4.编译你的应用
+
+
 
 ## License
 
