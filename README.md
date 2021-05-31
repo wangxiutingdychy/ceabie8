@@ -123,10 +123,10 @@ and then, set your app
 1. DexKnife只负责由配置的 类路径通配符 -> maindexlist 文件的转换，**不参与**其他的处理 和 编译过程。非全自动工具，需要对maindexlist特性有较深的了解。
 2. 如果出现运行时类找不到（i.e. class no def/found），请打开DexKnife的log功能，比对调试下DexKnife或ProGuard配置，检查生成的maindexlist是否匹配你的配置。**不要将在Application中使用被分到第二个dex中的类**。（即使不使用DexKnife，手动配置maindexlist也会出现这个样的问题）
 3. DexKnife只能明确指定第一个dex中的类，不能明确指定第二个dex以后的类（dex的maindexlist限制）。如果需要完全手动配置第一个dex，使用<br />
-        -donot-use-suggest
-        -split **
-        -keep android.support.multidex.** # 保证 multidex 或者你自己开发的multidex
-        -keep # 配置你的keep类的通配符，但数量不能超界
+        -donot-use-suggest<br />
+        -split ** <br />
+        -keep android.support.multidex.** # 保证 multidex 或者你自己开发的multidex <br />
+        -keep # 配置你的keep类的通配符，但数量不能超界 <br />
     
 4. DexKnife不带有依赖检测，需要你手动配置，因为DexKnife并不知道你的项目需求。
 5. DexKnife使用原始类路径作为配置，不要使用混淆后的类路径。
