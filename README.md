@@ -11,15 +11,16 @@ Also supports android gradle plugin 2.2.0 multidex.
 It will auto enable when disabled instant-run or in packaging release.**
 
 ###Update Log
-    1.5.7: fix support-split and support-keep are not work. (修复support-split/support-keep无效的bug)
-    1.5.6: Experimentally support java 1.7, fix nothing is selected when only -keep. (实验性的支持java 1.7,修复但只有keep选项时没有类被选中)
+    1.5.8: Compatible with gradle 3.2, fixed use of only support-split and support-keep resulting in an extra large number of classes.
+    1.5.7: fixed support-split and support-keep are not work. (修复support-split/support-keep无效的bug)
+    1.5.6: Experimentally compatible with java 1.7, fix nothing is selected when only -keep. (实验性的支持java 1.7,修复但只有keep选项时没有类被选中)
     1.5.5: support individual filter for suggest maindexlist. (单独的maindexlist过滤设置)
-    1.5.5.alpha: Experimentally support android gradle plugin on 2.2.0. (实验性的支持 2.2.0 plugin)
+    1.5.5.alpha: Experimentally compatible with android gradle plugin on 2.2.0. (实验性的支持 2.2.0 plugin)
     1.5.4: auto disabled when instant run mode.(instant run 模式时自动禁用DexKnife)
     1.5.3: add some track logs and skip DexKnife when jarMerging is null.(增加跟踪日志，并在jarMerging为null跳过处理)
-    1.5.2: fix the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)
-    1.5.1.exp: Experimentally support android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）
-    1.5.1: fix the proguard mode
+    1.5.2: fixed the include and exclude path, and supports filtering single class.(修复include和exclude, 并支持过滤单个类)
+    1.5.1.exp: Experimentally compatible with android gradle plugin on 2.1.0 （实验性的支持 2.1.0 plugin）
+    1.5.1: fixed the proguard mode
 
 ###Usage
 1.In your project's build.gradle, buildscript.
@@ -30,7 +31,7 @@ It will auto enable when disabled instant-run or in packaging release.**
         dependencies {
             ....
             classpath 'com.android.tools.build:gradle:2.2.0'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.7'
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.8'
         }
     }
 
@@ -109,6 +110,7 @@ and then, set your app
 - **注意：由于高于 2.0.0 的 instant-run 特性与 multidex不兼容，DexKnife会暂时禁用。当instant-run被禁用或者release打包时会自动启用。**
 
 ###更新日志
+    1.5.8: 兼容gradle 3.2，修复当只使用support-split/support-keep时出现大量的额外类
     1.5.7: 修复support-split/support-keep无效的bug
     1.5.6: 实验性的支持java 1.7,修复但只有keep选项时没有类被选中
     1.5.5: 增加单独的maindexlist过滤设置
@@ -117,11 +119,11 @@ and then, set your app
     1.5.3: 增加跟踪日志，并在jarMerging为null时跳过处理
     1.5.2: 修复include和exclude, 并支持过滤单个类
     1.5.1.exp: 实验性的支持 2.1.0 plugin
-    1.5.1: fix the proguard mode
+    1.5.1: 修复 proguard mode
 
-###特性
-1. DexKnife只负责由配置的 类路径通配符 -> maindexlist 文件的转换，**不参与**其他的处理 和 编译过程。非全自动工具，需要对maindexlist特性有较深的了解。
-2. 如果出现运行时类找不到（i.e. class no def/found），请打开DexKnife的log功能，比对调试下DexKnife或ProGuard配置，检查生成的maindexlist是否匹配你的配置。**不要将在Application中使用被分到第二个dex中的类**。（即使不使用DexKnife，手动配置maindexlist也会出现这个样的问题）
+###特性（重要）
+1. DexKnife只负责由配置的 类路径通配符 -> maindexlist 文件的转换，生成maindexlist.txt，**不参与**其他的处理和编译过程。非全自动工具，需要对maindexlist特性有较深的了解。
+2. 如果出现运行时类找不到（i.e. class no def/found），请打开DexKnife的log功能，比对调试下DexKnife或ProGuard配置，并检查生成的maindexlist是否匹配你的配置。**不要将在Application中使用到的类，分到第二个dex中**。（即使不使用DexKnife，手动配置maindexlist也会出现这个样的问题）
 3. DexKnife只能明确指定第一个dex中的类，不能明确指定第二个dex以后的类（dex的maindexlist限制）。如果需要完全手动配置第一个dex，使用<br />
         -donot-use-suggest<br />
         -split ** <br />
@@ -142,7 +144,7 @@ and then, set your app
         dependencies {
             ....
             classpath 'com.android.tools.build:gradle:2.2.0'  // or other
-            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.7'
+            classpath 'com.ceabie.dextools:gradle-dexknife-plugin:1.5.8'
         }
     }
 
