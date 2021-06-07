@@ -273,6 +273,12 @@ public class DexSplitTools {
         return maindexSpec;
     }
 
+
+    private static boolean isPatternSetEmpty(PatternSet patternSet) {
+        return patternSet.getExcludes().isEmpty() && patternSet.getIncludes().isEmpty()
+                && patternSet.getExcludeSpecs().isEmpty() && patternSet.getIncludeSpecs().isEmpty();
+    }
+
     /**
      * generate the main dex list
      */
@@ -300,7 +306,7 @@ public class DexSplitTools {
 
         // 2.process the global filter
         List<String> mainClasses = null;
-        if (dexKnifeConfig.patternSet == null || dexKnifeConfig.patternSet.isEmpty()) {
+        if (dexKnifeConfig.patternSet == null || isPatternSetEmpty(dexKnifeConfig.patternSet)) {
             // only filter the suggest list
             if (adtMainClasses != null && adtMainClasses.size() > 0) {
                 mainClasses = new ArrayList<>();
