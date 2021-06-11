@@ -54,7 +54,8 @@ It will auto enable when disabled instant-run or in packaging release.**
 **please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as:<br />
 Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2.Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.
+2.Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br />
+(The rest of any classes that is not marked split will be in miandexlist)
 
     Patterns may include:
 
@@ -170,7 +171,7 @@ and then, set your app
  **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：<br />
       Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2.在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.
+2.在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.（注意，其余任何未被注明split的类都会在miandexlist）
 
     Patterns may include:
 
@@ -182,9 +183,10 @@ and then, set your app
 
 更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
 
-**注意: <br />
-如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class <br />
-过滤的类路径使用非混淆的。<br />**
+**注意: **<br />
+1. **过滤的类路径使用非混淆的。**<br />
+2. 特别注意：使用全局split(或不加，也当做排除的)，**仅仅只有配置了split的类才会被移出maindex，未标注的剩余类都会保留在maindex中**。建议使用suggest-split排除ADT建议的类。
+3. 如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class。
 
 其他配置：
 
@@ -233,12 +235,10 @@ and then, set your app
 
 4.编译你的应用
 
-
-
 ## License
 
 ```
-Copyright (C) 2016 ceabie (http://blog.csdn.net/ceabie)
+Copyright (C) 2017 ceabie (http://blog.csdn.net/ceabie)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
