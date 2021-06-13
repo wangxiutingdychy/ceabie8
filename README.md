@@ -39,7 +39,7 @@ It will auto enable when disabled instant-run or in packaging release.**
 7. If you use the android gradle plugin's native multidex, but the declaration in the manifest is too much, resulting in the number of methods and variables are still overflow, or can not be packaged. You can simply use -suggest-split to move some of the classes in the suggest list out of the main dex.
 
 ###Usage
-1.In your project's build.gradle, buildscript.
+1.  In your project's build.gradle, buildscript.
 
     buildscript {
             ....
@@ -54,16 +54,16 @@ It will auto enable when disabled instant-run or in packaging release.**
 **please make sure gradle version is compatible with the android gradle plugin, otherwise it can causes some sync error, such as:<br />
 Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2.Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br />
+2.  Create a 'dexknife.txt' in your App's module, and config the patterns of classes path that wants to put into sencond dex.<br />
 (The rest of any classes that is not marked split will be in miandexlist)
 
-    Patterns may include:
+        Patterns may include:
 
-    '*' to match any number of characters
-    '?' to match any single character
-    '**' to match any number of directories or files
-    Either '.' or '/' may be used in a pattern to separate directories.
-    Patterns ending with '.' or '/' will have '**' automatically appended.
+        '*' to match any number of characters
+        '?' to match any single character
+        '**' to match any number of directories or files
+        Either '.' or '/' may be used in a pattern to separate directories.
+        Patterns ending with '.' or '/' will have '**' automatically appended.
 
 Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
 
@@ -107,7 +107,7 @@ Other config key:
     -suggest-split **.MainActivity2.class
     -suggest-keep android.support.multidex.**
     
-3.add to your app's build.gradle, add this line:
+3.  add to your app's build.gradle, add this line:
 
     apply plugin: 'com.ceabie.dexnkife'
 
@@ -117,7 +117,7 @@ and then, set your app
 
    - **Notes: You want to set 'multiDexEnabled true' in 'defaultConfig' or 'buildTypes', otherwise ineffective.**
 
-4.run your app
+4.  run your app
 
 # DexKnife（中文）
 
@@ -156,7 +156,7 @@ and then, set your app
 
 
 ###使用方法
-1.在你的工程的 build.gradle 中 buildscript:
+1.  在你的工程的 build.gradle 中 buildscript:
 
     buildscript {
             ....
@@ -171,22 +171,22 @@ and then, set your app
  **注意，请确保使用的gradle版本和android gradle plugin兼容，否则会出现同步错误，例如：<br />
       Gradle sync failed: Unable to load class 'com.android.builder.core.EvaluationErrorReporter'.**
 
-2.在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.（注意，其余任何未被注明split的类都会在miandexlist）
+2.  在App模块下创建 dexknife.txt，并填写要放到第二个dex中的包名路径的通配符.（注意，其余任何未被注明split的类都会在miandexlist）
 
-    Patterns may include:
+        Patterns may include:
 
-    '*' to match any number of characters
-    '?' to match any single character
-    '**' to match any number of directories or files
-    Either '.' or '/' may be used in a pattern to separate directories.
-    Patterns ending with '.' or '/' will have '**' automatically appended.
+        '*' to match any number of characters
+        '?' to match any single character
+        '**' to match any number of directories or files
+        Either '.' or '/' may be used in a pattern to separate directories.
+        Patterns ending with '.' or '/' will have '**' automatically appended.
 
 更多参见: https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html <br />
 
-**注意: **<br />
-1. **过滤的类路径使用非混淆的。**<br />
-2. 特别注意：使用全局split(或不加，也当做排除的)，**仅仅只有配置了split的类才会被移出maindex，未标注的剩余类都会保留在maindex中**。建议使用suggest-split排除ADT建议的类。
-3. 如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class。
+**注意:** <br />
+1.  **过滤的类路径使用非混淆的。**<br />
+2.  特别注意：使用全局split(或不加，也当做排除的)，**仅仅只有配置了split的类才会被移出maindex，未标注的剩余类都会保留在maindex中**。建议使用suggest-split排除ADT建议的类。<br />
+3.  如果你要过滤内部类, 使用$\*，例如: SomeClass$\*.class。
 
 其他配置：
 
@@ -234,6 +234,7 @@ and then, set your app
    - **注意：要在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用。**
 
 4.编译你的应用
+
 
 ## License
 
