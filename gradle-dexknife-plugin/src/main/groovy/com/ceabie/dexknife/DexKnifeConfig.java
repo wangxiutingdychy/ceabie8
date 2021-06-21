@@ -31,5 +31,6 @@ public class DexKnifeConfig {
     boolean filterSuggest = false;
     boolean logMainList = false;
     boolean logFilterSuggest = false;
+    boolean logFilter = false;
     Set<String> additionalParameters;
 }
